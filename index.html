@@ -1,36 +1,39 @@
 <!DOCTYPE html> 
 <html lang="en">
-    <head> 
-        <meta charset="UTF-8">
-        <title>My First Web page</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="css/style.css">
+  <head> 
+    <meta charset="UTF-8">
+    <title>My First Web page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
 
-    </head>
+  <body>
 
-    <body>
+    <header> 
+      <h1>Welcome to my Website!</h1>
+    </header>
 
-        <header> 
-            <h1>Welcome to my Website!</h1>
-        </header>
+    <main> 
+      <h2>Hello, my name is Pushpaharan!</h2>
+      <p>This is a basic HTML page that I'm starting</p>
 
-        <main> 
-            <h2>Hello, my name is Pushpaharan!</h2>
-            <p>This is a basic HTML page that I'm starting</p>
+      <button onclick="showMessage()">Click Me!</button>
+    </main> 
 
-            <button onclick="showMessage()">Click Me!</button>
-        </main> 
+    <footer> 
+      <p>&copy; 2026 Pushpaharan</p>
+    </footer> 
 
-        <footer> 
-            <p>&copy; 2026 Pushpaharan</p>
-        </footer> 
+    <!-- Inline JS (optional – you can move this to script.js later) -->
+    <script>
+      function showMessage() { 
+        alert("YOU CLICKED MY BUTTON!");
+      }
+    </script>
 
-        <script>
-            function showMessage() { 
-                alert("YOU CLICKED MY BUTTON!");
-            }
-           </script> 
+    <!-- External JS -->
+    <script src="js/script.js"></script>
 
-          </body>
-</html> 
-<script src="js/script.js"></script>
+  </body>
+</html>
+
