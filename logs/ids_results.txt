@@ -1,1 +1,3 @@
+with open("logs/results.txt", "w") as f:
+    f.write(f"{ip} -> {count}\n")
 
