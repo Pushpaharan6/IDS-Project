@@ -5,10 +5,27 @@ Author: Pushpaharan
 """
 
 import sys
+from scapy.all import rdpcap
+from collections import defaultdict
+
 
 def run_offline_mode(pcap_file):
     print(f"[+] Running IDS in OFFLINE mode on {pcap_file}")
-    # TODO: load PCAP and analyze packets
+    packets = rdpcap(pcap_file)
+    print(f"[+] Loaded {len(packets)} packets from {pcap_file}")
+
+
+    src_counts = defaultdict(int)
+
+    for pkt in packets:
+        if pkt.haslayer("IP"):
+            src_ip = pkt["IP"].src
+            src_counts[src_ip] += 1
+
+    print("[+] Top 5 source IPs by packet count:")
+    for ip, count in sorted(src_counts.items(), key=lambda x: x[1], reverse=True)[:5]:
+        print(f"    {ip} -> {count} packets")
+
 
 def run_live_mode(interface=None):
     print("[+] Running IDS in LIVE mode")
