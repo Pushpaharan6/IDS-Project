@@ -1,4 +1,13 @@
-# Packet capture placeholder
-# This will be expanded with Scapy or PyShark later
+"""
+packet_capture.py
+Basic packet capture module for IDS project
+Author: Pushpaharan
+"""
 
-print("Packet capture module loaded.")
+def main():
+    print("Packet capture module loaded.")
+    print("Ready to integrate Scapy or PyShark.")
+
+if __name__ == "__main__":
+    main()
+
