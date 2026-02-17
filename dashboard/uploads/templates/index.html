@@ -1,1 +1,100 @@
 
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Mini IDS Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    .card { border: 1px solid #ddd; padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .col { flex: 1; min-width: 320px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
+    .alert { font-weight: bold; }
+    .flash { background: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 10px; margin-bottom: 12px; }
+    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Mini IDS Dashboard</h1>
+  <p>Upload a PCAP, analyze it, and view alerts. Alerts are appended to <code>logs/alerts.log</code>.</p>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for msg in messages %}
+        <div class="flash">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="card">
+    <h2>Upload PCAP</h2>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <input type="file" name="pcap" accept=".pcap,.pcapng" required />
+      <button type="submit">Upload & Analyze</button>
+    </form>
+  </div>
+
+  <div class="row">
+    <div class="col card">
+      <h2>Results</h2>
+      {% if result %}
+        <p><b>PCAP:</b> {{ result.pcap_file }}</p>
+        <p><b>Total packets:</b> {{ result.total_packets }}</p>
+
+        <h3>Top Talkers</h3>
+        <table>
+          <tr><th>Source IP</th><th>Packets</th></tr>
+          {% for ip, count in result.top_talkers %}
+            <tr><td>{{ ip }}</td><td>{{ count }}</td></tr>
+          {% endfor %}
+        </table>
+
+        <h3>Alerts</h3>
+        {% if result.alerts %}
+          <ul>
+            {% for a in result.alerts %}
+              <li class="alert">{{ a }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No alerts triggered.</p>
+        {% endif %}
+
+        <h3>Chart</h3>
+        <canvas id="talkersChart"></canvas>
+
+        <script>
+          const labels = {{ result.chart_labels | tojson }};
+          const values = {{ result.chart_values | tojson }};
+
+          new Chart(document.getElementById('talkersChart'), {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Packets per Source IP',
+                data: values
+              }]
+            }
+          });
+        </script>
+      {% else %}
+        <p>No analysis yet. Upload a PCAP to begin.</p>
+      {% endif %}
+    </div>
+
+    <div class="col card">
+      <h2>Recent Alert Log</h2>
+      <p>Last 50 lines from <code>logs/alerts.log</code></p>
+      {% if recent_alerts %}
+        <pre style="white-space: pre-wrap;">{{ recent_alerts|join("\n") }}</pre>
+      {% else %}
+        <p>No alerts logged yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
