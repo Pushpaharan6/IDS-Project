@@ -7,6 +7,8 @@ It supports offline PCAP analysis and will later support live traffic monitoring
 - Offline packet analysis from PCAP
 - Top source IP detection
 - Suspicious traffic identification (future)
+- Categorizing Data use numpy (future)
+- Interface to interact via GUI (future)
 
 ## How to Run
 ```bash
