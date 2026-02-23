@@ -13,3 +13,13 @@ It supports offline PCAP analysis and will later support live traffic monitoring
 ## How to Run
 ```bash
 py scripts/ids_basic.py offline captures/sample_traffic.pcap
+
+## Suspicious Traffic Identification
+
+This IDS implements multiple detection rules:
+
+- Port scan detection: detects IPs contacting many unique destination ports
+- SYN activity detection: detects abnormal SYN packet activity
+- Alerts are printed to console and saved to logs/alerts.log
+
+Thresholds can be configured in ids_basic.py.
