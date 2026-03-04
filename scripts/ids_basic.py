@@ -19,8 +19,8 @@ import numpy as np
 # SETTINGS / THRESHOLDS
 # -----------------------
 
-PORTSCAN_UNIQUE_PORTS_THRESHOLD = 10   # >= 10 unique ports -> possible scan
-SYN_COUNT_THRESHOLD = 20               # >= 20 SYN packets -> suspicious
+PORTSCAN_UNIQUE_PORTS_THRESHOLD = 1  # >= 10 unique ports -> possible scan
+SYN_COUNT_THRESHOLD = 1           # >= 20 SYN packets -> suspicious
 
 
 # -----------------------
