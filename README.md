@@ -1,25 +1,32 @@
-# Intrusion Detection System (IDS)
+# Python Intrusion Detection System (IDS)
 
-This project implements a basic IDS in Python using Scapy.  
-It supports offline PCAP analysis and will later support live traffic monitoring.
+## Overview
+
+This project implements a **basic Intrusion Detection System (IDS)** using Python and the **Scapy** packet manipulation library.  
+The IDS analyzes network traffic to detect suspicious activity such as **port scanning** and **abnormal TCP SYN packet behavior**.
+
+The system supports both:
+
+- **Offline Analysis** – analyzing saved PCAP files
+- **Live Monitoring** – capturing and analyzing real-time network traffic
+
+This project demonstrates core **Cybersecurity and Network Monitoring concepts** such as packet inspection, traffic analysis, and attack detection.
+
+---
 
 ## Features
-- Offline packet analysis from PCAP
-- Top source IP detection
-- Suspicious traffic identification (future)
-- Categorizing Data use numpy (future)
-- Interface to interact via GUI (future)
 
-## How to Run
-```bash
-py scripts/ids_basic.py offline captures/sample_traffic.pcap
+- PCAP packet analysis
+- Live network traffic monitoring
+- Port scan detection
+- TCP SYN activity detection
+- Top source IP identification
+- Traffic categorization using NumPy
+- Alert logging system
+- Simple modular IDS architecture
 
-## Suspicious Traffic Identification
+---
 
-This IDS implements multiple detection rules:
+## Project Structure
 
-- Port scan detection: detects IPs contacting many unique destination ports
-- SYN activity detection: detects abnormal SYN packet activity
-- Alerts are printed to console and saved to logs/alerts.log
 
-Thresholds can be configured in ids_basic.py.
