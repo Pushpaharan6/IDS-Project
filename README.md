@@ -62,6 +62,13 @@ py scripts/ids_basic.py offline captures/sample_traffic.pcap
 py scripts/ids_basic.py live
 py scripts\ids_basic.py live 3 500 60
 
+## Web Dashboard
+Start the Flask dashboard:
+py app.py
+
+Then open this in your browser:
+http://127.0.0.1:5000
+
 ## Alert Logging
 
 All alerts are saved to:
@@ -97,9 +104,26 @@ The IDS was improved by:
 - Adding try/except error handling for file reading and log writing
 - Replacing repeated numeric values in loops with named constants for cleaner, more maintainable code
 
+
+## Dashboard
+
+The project includes a basic Flask web dashboard with a dark cyber-style interface. The dashboard allows the user to:
+
+- Upload `.pcap` or `.pcapng` files
+- View packet summary information
+- Review detected alerts
+- View top source IPs
+- Review recent entries from `logs/alerts.log`
+
+Note: The dashboard runs locally and is available only while the Flask server is active.
+
 ## Future Improvements
 
-• Web dashboard for alerts  
-• Machine learning anomaly detection  
-• Real-time network visualization  
-• Integration with SIEM systems
+  Machine learning anomaly detection  
+  Real-time network visualization  
+  Integration with SIEM systems
+  Improve live capture reliability on Windows virtual adapters
+  Add charts and visual analytics to the dashboard
+  Add downloadable CSV/TXT reports
+  Add more detection rules
+  Improve alert severity levels
