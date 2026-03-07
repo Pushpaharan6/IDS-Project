@@ -88,6 +88,14 @@ Top 5 source IPs:
 [!] ALERT PORT_SCAN Source=192.168.8.50 UniquePorts=120
 [!] ALERT SYN_ACTIVITY Source=192.168.8.50 SYNs=140
 
+## Improvements
+
+The IDS was improved by:
+
+- Expanding alert log details to include the actual destination ports involved in a detected port scan
+- Adding try/except error handling for file reading and log writing
+- Replacing repeated numeric values in loops with named constants for cleaner, more maintainable code
+
 ## Future Improvements
 
 • Web dashboard for alerts  
