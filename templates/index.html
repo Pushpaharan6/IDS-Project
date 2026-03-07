@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDS Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="page">
+        <header class="header">
+            <h1>Intrusion Detection System Dashboard</h1>
+            <p>Upload a PCAP file and review alerts</p>
+        </header>
+
+        <section class="card upload-card">
+            <h2>Upload PCAP</h2>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for msg in messages %}
+                        <div class="flash-message">{{ msg }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="pcap_file" accept=".pcap,.pcapng" required>
+                <button type="submit">Analyze File</button>
+            </form>
+        </section>
+
+        {% if result %}
+        <section class="stats-grid">
+            <div class="card stat-card">
+                <h3>Total Packets</h3>
+                <p>{{ result.total_packets }}</p>
+            </div>
+            <div class="card stat-card">
+                <h3>Low Traffic IPs</h3>
+                <p>{{ result.traffic_categories.low_count }}</p>
+            </div>
+            <div class="card stat-card">
+                <h3>Medium Traffic IPs</h3>
+                <p>{{ result.traffic_categories.medium_count }}</p>
+            </div>
+            <div class="card stat-card">
+                <h3>High Traffic IPs</h3>
+                <p>{{ result.traffic_categories.high_count }}</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Detected Alerts</h2>
+            {% if result.alerts %}
+                <div class="alerts-list">
+                    {% for alert in result.alerts %}
+                        <div class="alert-box">
+                            <strong>{{ alert.type }}</strong><br>
+                            Source: {{ alert.source }}<br>
+                            {{ alert.details }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No suspicious activity detected in this file.</p>
+            {% endif %}
+        </section>
+
+        <section class="card">
+            <h2>Top Source IPs</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Source IP</th>
+                        <th>Packets</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ip, count in result.top_talkers %}
+                    <tr>
+                        <td>{{ ip }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+        {% endif %}
+
+        <section class="card">
+            <h2>Recent Alerts Log</h2>
+            {% if alerts_log %}
+                {% for line in alerts_log %}
+                    <div class="log-line">{{ line }}</div>
+                {% endfor %}
+            {% else %}
+                <p>No alerts logged yet.</p>
+            {% endif %}
+        </section>
+    </div>
+</body>
+</html>

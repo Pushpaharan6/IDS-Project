@@ -249,8 +249,6 @@ def run_offline_mode(pcap_file: str):
 def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEFAULT_TIMEOUT):
     """Capture and analyze live network traffic."""
 
-    # If the user passes an interface index like 3, resolve it to the
-    # actual interface object Scapy can use on Windows.
     if isinstance(interface, int):
         try:
             interface = IFACES.dev_from_index(interface)
@@ -280,6 +278,65 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
     detect_syn_activity(src_syn_counts)
 
     print(f"\n[+] Alerts saved to {DEFAULT_LOG_PATH}")
+
+
+# -----------------------
+# DASHBOARD SUPPORT
+# -----------------------
+
+def analyze_pcap_for_dashboard(pcap_file: str):
+    """Return IDS results as a dictionary for Flask dashboard."""
+    if not os.path.exists(pcap_file):
+        return {"error": f"File not found: {pcap_file}"}
+
+    try:
+        packets = rdpcap(pcap_file)
+    except Exception as e:
+        return {"error": f"Error reading PCAP file: {e}"}
+
+    src_counts, src_to_ports, src_syn_counts = analyze_packets(packets)
+
+    top_talkers = sorted(
+        src_counts.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )[:TOP_TALKERS_COUNT]
+
+    low, medium, high, p50, p90 = categorize_traffic_numpy(src_counts)
+
+    alerts = []
+
+    for src_ip, port_set in src_to_ports.items():
+        unique_ports = len(port_set)
+        if unique_ports >= PORTSCAN_UNIQUE_PORTS_THRESHOLD:
+            sorted_ports = sorted(port_set)
+            alerts.append({
+                "type": "PORT_SCAN",
+                "source": src_ip,
+                "details": f"UniquePorts={unique_ports}, Ports={sorted_ports}"
+            })
+
+    for src_ip, syn_count in src_syn_counts.items():
+        if syn_count >= SYN_COUNT_THRESHOLD:
+            alerts.append({
+                "type": "SYN_ACTIVITY",
+                "source": src_ip,
+                "details": f"SYNs={syn_count}"
+            })
+
+    return {
+        "pcap_file": pcap_file,
+        "total_packets": len(packets),
+        "top_talkers": top_talkers,
+        "traffic_categories": {
+            "low_count": len(low),
+            "medium_count": len(medium),
+            "high_count": len(high),
+            "p50": p50,
+            "p90": p90
+        },
+        "alerts": alerts
+    }
 
 
 # -----------------------
