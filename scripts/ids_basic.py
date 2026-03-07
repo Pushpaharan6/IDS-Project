@@ -16,26 +16,33 @@ import numpy as np
 
 
 # -----------------------
-# SETTINGS / THRESHOLDS
+# SETTINGS / CONSTANTS
 # -----------------------
 
-PORTSCAN_UNIQUE_PORTS_THRESHOLD = 1  # >= 10 unique ports -> possible scan
-SYN_COUNT_THRESHOLD = 1           # >= 20 SYN packets -> suspicious
+PORTSCAN_UNIQUE_PORTS_THRESHOLD = 10   # >= 10 unique ports -> possible scan
+SYN_COUNT_THRESHOLD = 20               # >= 20 SYN packets -> suspicious
+TOP_TALKERS_COUNT = 5                  # show top 5 source IPs
+TOP_CATEGORY_DISPLAY_COUNT = 3         # show top 3 IPs in each traffic category
+DEFAULT_PACKET_LIMIT = 200
+DEFAULT_TIMEOUT = 30
+DEFAULT_LOG_PATH = "logs/alerts.log"
 
 
 # -----------------------
 # LOGGING
 # -----------------------
 
-def log_alert(message: str, log_path="logs/alerts.log"):
-    """Write alerts to logs/alerts.log"""
+def log_alert(message: str, log_path: str = DEFAULT_LOG_PATH):
+    """Write alerts to logs/alerts.log with timestamp."""
+    try:
+        os.makedirs(os.path.dirname(log_path), exist_ok=True)
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(f"{timestamp} {message}\n")
 
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    with open(log_path, "a", encoding="utf-8") as f:
-        f.write(f"{timestamp} {message}\n")
+    except Exception as e:
+        print(f"[!] ERROR writing to log file: {e}")
 
 
 # -----------------------
@@ -43,26 +50,30 @@ def log_alert(message: str, log_path="logs/alerts.log"):
 # -----------------------
 
 def detect_port_scan(src_to_ports: dict):
-
+    """
+    Rule A: Port scan detection
+    Detects source IPs contacting many unique destination ports.
+    """
     print("\n[+] Port Scan Check (unique destination ports per source):")
-
     detected = False
 
     for src_ip, port_set in src_to_ports.items():
-
         unique_ports = len(port_set)
 
         if unique_ports >= PORTSCAN_UNIQUE_PORTS_THRESHOLD:
-
             detected = True
+            sorted_ports = sorted(port_set)
 
             alert_msg = (
-                f"ALERT PORT_SCAN Source={src_ip} UniquePorts={unique_ports} "
-                f"Threshold={PORTSCAN_UNIQUE_PORTS_THRESHOLD}"
+                f"ALERT PORT_SCAN "
+                f"Source={src_ip} "
+                f"UniquePorts={unique_ports} "
+                f"Ports={sorted_ports} "
+                f"Threshold={PORTSCAN_UNIQUE_PORTS_THRESHOLD} "
+                f"Detection=Possible_Port_Scan"
             )
 
             print("[!]", alert_msg)
-
             log_alert(alert_msg)
 
     if not detected:
@@ -70,24 +81,26 @@ def detect_port_scan(src_to_ports: dict):
 
 
 def detect_syn_activity(src_syn_counts: dict):
-
+    """
+    Rule B: SYN activity detection
+    Detects unusually high TCP SYN packet counts per source IP.
+    """
     print("\n[+] SYN Activity Check (SYN packets per source):")
-
     detected = False
 
     for src_ip, syn_count in src_syn_counts.items():
-
         if syn_count >= SYN_COUNT_THRESHOLD:
-
             detected = True
 
             alert_msg = (
-                f"ALERT SYN_ACTIVITY Source={src_ip} SYNs={syn_count} "
-                f"Threshold={SYN_COUNT_THRESHOLD}"
+                f"ALERT SYN_ACTIVITY "
+                f"Source={src_ip} "
+                f"SYNs={syn_count} "
+                f"Threshold={SYN_COUNT_THRESHOLD} "
+                f"Detection=Possible_SYN_Scan_or_Flood"
             )
 
             print("[!]", alert_msg)
-
             log_alert(alert_msg)
 
     if not detected:
@@ -99,7 +112,10 @@ def detect_syn_activity(src_syn_counts: dict):
 # -----------------------
 
 def categorize_traffic_numpy(src_counts: dict):
-
+    """
+    Categorize source IPs into Low / Medium / High traffic using NumPy percentiles.
+    Returns: (low_list, medium_list, high_list, p50, p90)
+    """
     if not src_counts:
         return [], [], [], 0, 0
 
@@ -111,13 +127,10 @@ def categorize_traffic_numpy(src_counts: dict):
     low, medium, high = [], [], []
 
     for ip, count in src_counts.items():
-
         if count <= p50:
             low.append((ip, count))
-
         elif count <= p90:
             medium.append((ip, count))
-
         else:
             high.append((ip, count))
 
@@ -128,135 +141,131 @@ def categorize_traffic_numpy(src_counts: dict):
     return low, medium, high, p50, p90
 
 
+def print_traffic_categories(src_counts: dict):
+    """Display NumPy-based traffic categories."""
+    low, medium, high, p50, p90 = categorize_traffic_numpy(src_counts)
+
+    print("\n[+] Traffic Categories:")
+    print(f"    Low <= {p50}")
+    print(f"    Medium <= {p90}")
+    print(f"    High > {p90}")
+
+    print(f"\n    Top Low Traffic (max {TOP_CATEGORY_DISPLAY_COUNT}):")
+    for ip, count in low[:TOP_CATEGORY_DISPLAY_COUNT]:
+        print(f"      {ip} -> {count}")
+
+    print(f"\n    Top Medium Traffic (max {TOP_CATEGORY_DISPLAY_COUNT}):")
+    for ip, count in medium[:TOP_CATEGORY_DISPLAY_COUNT]:
+        print(f"      {ip} -> {count}")
+
+    print(f"\n    Top High Traffic (max {TOP_CATEGORY_DISPLAY_COUNT}):")
+    for ip, count in high[:TOP_CATEGORY_DISPLAY_COUNT]:
+        print(f"      {ip} -> {count}")
+
+
 # -----------------------
-# OFFLINE MODE
+# SHARED PACKET ANALYSIS
 # -----------------------
 
-def run_offline_mode(pcap_file):
-
-    if not os.path.exists(pcap_file):
-
-        print(f"[!] ERROR: File not found: {pcap_file}")
-        return
-
-    print(f"[+] Running IDS in OFFLINE mode on {pcap_file}")
-
-    packets = rdpcap(pcap_file)
-
-    print(f"[+] Loaded {len(packets)} packets")
-
+def analyze_packets(packets):
+    """
+    Analyze packets and build traffic statistics used by both offline and live modes.
+    Returns:
+        src_counts, src_to_ports, src_syn_counts
+    """
     src_counts = defaultdict(int)
     src_to_ports = defaultdict(set)
     src_syn_counts = defaultdict(int)
 
     for pkt in packets:
-
         if pkt.haslayer(IP):
-
             src_ip = pkt[IP].src
-
             src_counts[src_ip] += 1
 
             if pkt.haslayer(TCP):
-
                 dport = int(pkt[TCP].dport)
-
                 src_to_ports[src_ip].add(dport)
 
                 flags = int(pkt[TCP].flags)
-
                 SYN = 0x02
                 ACK = 0x10
 
+                # Count SYN packets without ACK
                 if (flags & SYN) and not (flags & ACK):
-
                     src_syn_counts[src_ip] += 1
 
-    # Top talkers
+    return src_counts, src_to_ports, src_syn_counts
 
-    print("\n[+] Top 5 source IPs:")
 
-    top5 = sorted(src_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+def print_top_talkers(src_counts: dict):
+    """Print top source IPs by packet count."""
+    print(f"\n[+] Top {TOP_TALKERS_COUNT} source IPs:")
 
-    for ip, count in top5:
+    top_talkers = sorted(src_counts.items(), key=lambda x: x[1], reverse=True)[:TOP_TALKERS_COUNT]
+
+    for ip, count in top_talkers:
         print(f"    {ip} -> {count} packets")
 
-    # NumPy analysis
 
-    low, medium, high, p50, p90 = categorize_traffic_numpy(src_counts)
+# -----------------------
+# OFFLINE MODE
+# -----------------------
 
-    print("\n[+] Traffic Categories:")
+def run_offline_mode(pcap_file: str):
+    """Analyze packets from a saved PCAP/PCAPNG file."""
+    if not os.path.exists(pcap_file):
+        print(f"[!] ERROR: File not found: {pcap_file}")
+        return
 
-    print(f"    Low <= {p50}")
-    print(f"    Medium <= {p90}")
-    print(f"    High > {p90}")
+    print(f"[+] Running IDS in OFFLINE mode on {pcap_file}")
 
-    # Detection rules
+    try:
+        packets = rdpcap(pcap_file)
+    except Exception as e:
+        print(f"[!] ERROR reading PCAP file: {e}")
+        return
+
+    print(f"[+] Loaded {len(packets)} packets")
+
+    src_counts, src_to_ports, src_syn_counts = analyze_packets(packets)
+
+    print_top_talkers(src_counts)
+    print_traffic_categories(src_counts)
 
     detect_port_scan(src_to_ports)
-
     detect_syn_activity(src_syn_counts)
 
-    print("\n[+] Alerts saved to logs/alerts.log")
+    print(f"\n[+] Alerts saved to {DEFAULT_LOG_PATH}")
 
 
 # -----------------------
 # LIVE MODE
 # -----------------------
 
-def run_live_mode(interface=None, packet_limit=200, timeout=30):
-
+def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEFAULT_TIMEOUT):
+    """Capture and analyze live network traffic."""
     print("[+] Running IDS in LIVE mode")
-
     print(f"    Interface: {interface if interface else 'default'}")
-
     print(f"    Packet limit: {packet_limit}")
-
     print(f"    Timeout: {timeout} seconds")
 
-    packets = sniff(iface=interface, count=packet_limit, timeout=timeout)
+    try:
+        packets = sniff(iface=interface, count=packet_limit, timeout=timeout)
+    except Exception as e:
+        print(f"[!] ERROR capturing live traffic: {e}")
+        return
 
     print(f"[+] Captured {len(packets)} packets")
 
-    src_counts = defaultdict(int)
-    src_to_ports = defaultdict(set)
-    src_syn_counts = defaultdict(int)
+    src_counts, src_to_ports, src_syn_counts = analyze_packets(packets)
 
-    for pkt in packets:
-
-        if pkt.haslayer(IP):
-
-            src_ip = pkt[IP].src
-
-            src_counts[src_ip] += 1
-
-            if pkt.haslayer(TCP):
-
-                dport = int(pkt[TCP].dport)
-
-                src_to_ports[src_ip].add(dport)
-
-                flags = int(pkt[TCP].flags)
-
-                SYN = 0x02
-                ACK = 0x10
-
-                if (flags & SYN) and not (flags & ACK):
-
-                    src_syn_counts[src_ip] += 1
-
-    print("\n[+] Top 5 source IPs:")
-
-    top5 = sorted(src_counts.items(), key=lambda x: x[1], reverse=True)[:5]
-
-    for ip, count in top5:
-        print(f"    {ip} -> {count} packets")
+    print_top_talkers(src_counts)
+    print_traffic_categories(src_counts)
 
     detect_port_scan(src_to_ports)
-
     detect_syn_activity(src_syn_counts)
 
-    print("\n[+] Alerts saved to logs/alerts.log")
+    print(f"\n[+] Alerts saved to {DEFAULT_LOG_PATH}")
 
 
 # -----------------------
@@ -264,50 +273,41 @@ def run_live_mode(interface=None, packet_limit=200, timeout=30):
 # -----------------------
 
 def main():
-
     if len(sys.argv) < 2:
-
         print("\nUsage:")
-
-        print("Offline mode:")
-        print("  py scripts/ids_basic.py offline captures/file.pcap")
-
-        print("\nLive mode:")
-        print("  py scripts/ids_basic.py live")
-
-        print("  py scripts/ids_basic.py live <interface>")
-
-        print("  py scripts/ids_basic.py live <interface> <packet_limit> <timeout>")
-
+        print("  Offline mode:")
+        print("    py scripts/ids_basic.py offline captures/file.pcap")
+        print("    py scripts/ids_basic.py offline captures/file.pcapng")
+        print("\n  Live mode:")
+        print("    py scripts/ids_basic.py live")
+        print("    py scripts/ids_basic.py live <interface>")
+        print("    py scripts/ids_basic.py live <interface> <packet_limit> <timeout>")
         return
 
     mode = sys.argv[1].lower()
 
     if mode == "offline":
-
         if len(sys.argv) < 3:
-
-            print("[!] ERROR: Please provide a PCAP file")
-
+            print("[!] ERROR: Please provide a PCAP file.")
             return
 
         pcap_file = sys.argv[2]
-
         run_offline_mode(pcap_file)
 
     elif mode == "live":
-
         interface = sys.argv[2] if len(sys.argv) >= 3 else None
 
-        packet_limit = int(sys.argv[3]) if len(sys.argv) >= 4 else 200
-
-        timeout = int(sys.argv[4]) if len(sys.argv) >= 5 else 30
+        try:
+            packet_limit = int(sys.argv[3]) if len(sys.argv) >= 4 else DEFAULT_PACKET_LIMIT
+            timeout = int(sys.argv[4]) if len(sys.argv) >= 5 else DEFAULT_TIMEOUT
+        except ValueError:
+            print("[!] ERROR: packet_limit and timeout must be integers.")
+            return
 
         run_live_mode(interface, packet_limit, timeout)
 
     else:
-
-        print("[!] Unknown mode. Use 'offline' or 'live'")
+        print("[!] Unknown mode. Use 'offline' or 'live'.")
 
 
 if __name__ == "__main__":
