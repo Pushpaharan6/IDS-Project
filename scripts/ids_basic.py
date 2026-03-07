@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 from collections import defaultdict
 
-from scapy.all import rdpcap, sniff, IP, TCP
+from scapy.all import rdpcap, sniff, IP, TCP, IFACES
 import numpy as np
 
 
@@ -201,7 +201,11 @@ def print_top_talkers(src_counts: dict):
     """Print top source IPs by packet count."""
     print(f"\n[+] Top {TOP_TALKERS_COUNT} source IPs:")
 
-    top_talkers = sorted(src_counts.items(), key=lambda x: x[1], reverse=True)[:TOP_TALKERS_COUNT]
+    top_talkers = sorted(
+        src_counts.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )[:TOP_TALKERS_COUNT]
 
     for ip, count in top_talkers:
         print(f"    {ip} -> {count} packets")
@@ -244,6 +248,16 @@ def run_offline_mode(pcap_file: str):
 
 def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEFAULT_TIMEOUT):
     """Capture and analyze live network traffic."""
+
+    # If the user passes an interface index like 3, resolve it to the
+    # actual interface object Scapy can use on Windows.
+    if isinstance(interface, int):
+        try:
+            interface = IFACES.dev_from_index(interface)
+        except Exception as e:
+            print(f"[!] ERROR resolving interface index: {e}")
+            return
+
     print("[+] Running IDS in LIVE mode")
     print(f"    Interface: {interface if interface else 'default'}")
     print(f"    Packet limit: {packet_limit}")
@@ -282,6 +296,7 @@ def main():
         print("    py scripts/ids_basic.py live")
         print("    py scripts/ids_basic.py live <interface>")
         print("    py scripts/ids_basic.py live <interface> <packet_limit> <timeout>")
+        print("    py scripts/ids_basic.py live 3 500 60")
         return
 
     mode = sys.argv[1].lower()
@@ -295,7 +310,11 @@ def main():
         run_offline_mode(pcap_file)
 
     elif mode == "live":
-        interface = sys.argv[2] if len(sys.argv) >= 3 else None
+        interface = (
+            int(sys.argv[2])
+            if len(sys.argv) >= 3 and sys.argv[2].isdigit()
+            else (sys.argv[2] if len(sys.argv) >= 3 else None)
+        )
 
         try:
             packet_limit = int(sys.argv[3]) if len(sys.argv) >= 4 else DEFAULT_PACKET_LIMIT
