@@ -60,6 +60,7 @@ py scripts/ids_basic.py offline captures/sample_traffic.pcap
 
 ## Live mode 
 py scripts/ids_basic.py live
+py scripts\ids_basic.py live 3 500 60
 
 ## Alert Logging
 
