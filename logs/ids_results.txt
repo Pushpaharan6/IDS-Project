@@ -1,3 +1,7 @@
-with open("logs/results.txt", "w") as f:
-    f.write(f"{ip} -> {count}\n")
-
+IDS OFFLINE RESULTS - 2026-03-11 01:08:57
+PCAP File: captures\kali_portscan.pcapng
+Total Packets: 12619
+Unique Source IPs: 3
+Top Talkers: [('212.102.46.24', 9399), ('192.168.8.137', 3206), ('192.168.8.160', 4)]
+Traffic Thresholds: p50=3206, p90=8160
+Alert Count: 0

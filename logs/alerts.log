@@ -190,3 +190,8 @@
 2026-03-07 12:02:37 ALERT PORT_SCAN Source=107.21.50.245 UniquePorts=1 Threshold=1
 2026-03-07 12:02:37 ALERT PORT_SCAN Source=35.190.80.1 UniquePorts=1 Threshold=1
 2026-03-07 12:02:37 ALERT SYN_ACTIVITY Source=172.20.10.10 SYNs=1 Threshold=1
+2026-03-11 01:08:57 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-03-11 01:08:57 INFO OFFLINE_NO_ALERTS pcap_file=captures\kali_portscan.pcapng packet_count=12619 unique_source_ips=3
+2026-03-11 01:10:27 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
+2026-03-11 01:12:31 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
+2026-03-11 01:17:46 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60

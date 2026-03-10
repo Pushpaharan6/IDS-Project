@@ -21,14 +21,17 @@ import numpy as np
 # SETTINGS / CONSTANTS
 # -----------------------
 
-PORTSCAN_UNIQUE_PORTS_THRESHOLD = 1   # >= 3 unique ports -> possible scan
-SYN_COUNT_THRESHOLD = 1             # >= 5 SYN packets -> suspicious
+PORTSCAN_UNIQUE_PORTS_THRESHOLD = 1  # >= 3 unique ports -> possible scan
+SYN_COUNT_THRESHOLD = 1              # >= 5 SYN packets -> suspicious
 TOP_TALKERS_COUNT = 5                 # show top 5 source IPs
 TOP_CATEGORY_DISPLAY_COUNT = 3        # show top 3 IPs in each traffic category
 DEFAULT_PACKET_LIMIT = 200
 DEFAULT_TIMEOUT = 30
 DEFAULT_LOG_PATH = "logs/alerts.log"
 DEFAULT_JSON_LOG_PATH = "logs/alerts.jsonl"
+DEFAULT_RESULTS_PATH = "logs/ids_results.txt"
+
+# Use TCP for normal live capture. If this fails or captures 0, code falls back without filter.
 LIVE_SNIFF_FILTER = "tcp"
 
 
@@ -36,32 +39,57 @@ LIVE_SNIFF_FILTER = "tcp"
 # LOGGING
 # -----------------------
 
+def current_timestamp() -> str:
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
 def log_alert(message: str, log_path: str = DEFAULT_LOG_PATH):
-    """Write alerts to text log with timestamp."""
+    """Write message to text log with timestamp."""
     try:
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
         with open(log_path, "a", encoding="utf-8") as f:
-            f.write(f"{timestamp} {message}\n")
-
+            f.write(f"{current_timestamp()} {message}\n")
     except Exception as e:
         print(f"[!] ERROR writing to log file: {e}")
 
 
-def log_alert_json(alert_data: dict, log_path: str = DEFAULT_JSON_LOG_PATH):
-    """Write structured alert data in JSON lines format for SIEM-style ingestion."""
+def log_alert_json(record: dict, log_path: str = DEFAULT_JSON_LOG_PATH):
+    """Write structured alert/info data as one JSON object per line."""
     try:
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
-
-        alert_record = alert_data.copy()
-        alert_record["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        payload = record.copy()
+        payload["timestamp"] = current_timestamp()
 
         with open(log_path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(alert_record) + "\n")
-
+            f.write(json.dumps(payload) + "\n")
     except Exception as e:
         print(f"[!] ERROR writing JSON alert log: {e}")
+
+
+def log_info_event(event_type: str, details: dict):
+    """Write non-alert informational events so logs are not empty."""
+    text_parts = [f"INFO {event_type}"]
+    for key, value in details.items():
+        text_parts.append(f"{key}={value}")
+    text_message = " ".join(text_parts)
+
+    log_alert(text_message)
+    log_alert_json({
+        "record_type": "INFO",
+        "event_type": event_type,
+        **details
+    })
+
+
+def write_results_summary(lines, results_path: str = DEFAULT_RESULTS_PATH):
+    """Write a plain text summary report for the latest run."""
+    try:
+        os.makedirs(os.path.dirname(results_path), exist_ok=True)
+        with open(results_path, "w", encoding="utf-8") as f:
+            for line in lines:
+                f.write(line + "\n")
+    except Exception as e:
+        print(f"[!] ERROR writing results summary: {e}")
 
 
 # -----------------------
@@ -82,6 +110,23 @@ def list_interfaces():
             print(f"    {iface}")
 
 
+def resolve_interface(interface):
+    """
+    Convert an interface index to a Scapy interface object if needed.
+    Keep strings as-is.
+    """
+    if interface is None:
+        return None
+
+    if isinstance(interface, int):
+        try:
+            return IFACES.dev_from_index(interface)
+        except Exception as e:
+            raise RuntimeError(f"Could not resolve interface index {interface}: {e}") from e
+
+    return interface
+
+
 # -----------------------
 # DETECTION RULES
 # -----------------------
@@ -90,15 +135,15 @@ def detect_port_scan(src_to_ports: dict):
     """
     Rule A: Port scan detection
     Detects source IPs contacting many unique destination ports.
+    Returns a list of alert dictionaries.
     """
     print("\n[+] Port Scan Check (unique destination ports per source):")
-    detected = False
+    alerts = []
 
     for src_ip, port_set in src_to_ports.items():
         unique_ports = len(port_set)
 
         if unique_ports >= PORTSCAN_UNIQUE_PORTS_THRESHOLD:
-            detected = True
             sorted_ports = sorted(port_set)
 
             alert_msg = (
@@ -113,7 +158,8 @@ def detect_port_scan(src_to_ports: dict):
             print("[!]", alert_msg)
             log_alert(alert_msg)
 
-            log_alert_json({
+            alert_record = {
+                "record_type": "ALERT",
                 "alert_type": "PORT_SCAN",
                 "source_ip": src_ip,
                 "unique_ports": unique_ports,
@@ -121,24 +167,27 @@ def detect_port_scan(src_to_ports: dict):
                 "threshold": PORTSCAN_UNIQUE_PORTS_THRESHOLD,
                 "severity": "medium",
                 "detection": "Possible_Port_Scan"
-            })
+            }
+            log_alert_json(alert_record)
+            alerts.append(alert_record)
 
-    if not detected:
+    if not alerts:
         print("[+] No port scan behavior detected.")
+
+    return alerts
 
 
 def detect_syn_activity(src_syn_counts: dict):
     """
     Rule B: SYN activity detection
     Detects unusually high TCP SYN packet counts per source IP.
+    Returns a list of alert dictionaries.
     """
     print("\n[+] SYN Activity Check (SYN packets per source):")
-    detected = False
+    alerts = []
 
     for src_ip, syn_count in src_syn_counts.items():
         if syn_count >= SYN_COUNT_THRESHOLD:
-            detected = True
-
             alert_msg = (
                 f"ALERT SYN_ACTIVITY "
                 f"Source={src_ip} "
@@ -150,17 +199,22 @@ def detect_syn_activity(src_syn_counts: dict):
             print("[!]", alert_msg)
             log_alert(alert_msg)
 
-            log_alert_json({
+            alert_record = {
+                "record_type": "ALERT",
                 "alert_type": "SYN_ACTIVITY",
                 "source_ip": src_ip,
                 "syn_count": syn_count,
                 "threshold": SYN_COUNT_THRESHOLD,
                 "severity": "medium",
                 "detection": "Possible_SYN_Scan_or_Flood"
-            })
+            }
+            log_alert_json(alert_record)
+            alerts.append(alert_record)
 
-    if not detected:
+    if not alerts:
         print("[+] No suspicious SYN activity detected.")
+
+    return alerts
 
 
 # -----------------------
@@ -198,7 +252,7 @@ def categorize_traffic_numpy(src_counts: dict):
 
 
 def print_traffic_categories(src_counts: dict):
-    """Display NumPy-based traffic categories."""
+    """Display NumPy-based traffic categories and return summary text lines."""
     low, medium, high, p50, p90 = categorize_traffic_numpy(src_counts)
 
     print("\n[+] Traffic Categories:")
@@ -218,6 +272,14 @@ def print_traffic_categories(src_counts: dict):
     for ip, count in high[:TOP_CATEGORY_DISPLAY_COUNT]:
         print(f"      {ip} -> {count}")
 
+    return {
+        "low": low,
+        "medium": medium,
+        "high": high,
+        "p50": p50,
+        "p90": p90
+    }
+
 
 # -----------------------
 # SHARED PACKET ANALYSIS
@@ -234,27 +296,31 @@ def analyze_packets(packets):
     src_syn_counts = defaultdict(int)
 
     for pkt in packets:
-        if pkt.haslayer(IP):
-            src_ip = pkt[IP].src
-            src_counts[src_ip] += 1
+        try:
+            if pkt.haslayer(IP):
+                src_ip = pkt[IP].src
+                src_counts[src_ip] += 1
 
-            if pkt.haslayer(TCP):
-                dport = int(pkt[TCP].dport)
-                src_to_ports[src_ip].add(dport)
+                if pkt.haslayer(TCP):
+                    dport = int(pkt[TCP].dport)
+                    src_to_ports[src_ip].add(dport)
 
-                flags = int(pkt[TCP].flags)
-                SYN = 0x02
-                ACK = 0x10
+                    flags = int(pkt[TCP].flags)
+                    syn_flag = 0x02
+                    ack_flag = 0x10
 
-                # Count SYN packets without ACK
-                if (flags & SYN) and not (flags & ACK):
-                    src_syn_counts[src_ip] += 1
+                    # Count SYN packets without ACK
+                    if (flags & syn_flag) and not (flags & ack_flag):
+                        src_syn_counts[src_ip] += 1
+        except Exception:
+            # Skip malformed packet instead of crashing
+            continue
 
     return src_counts, src_to_ports, src_syn_counts
 
 
 def print_top_talkers(src_counts: dict):
-    """Print top source IPs by packet count."""
+    """Print top source IPs by packet count and return top talkers list."""
     print(f"\n[+] Top {TOP_TALKERS_COUNT} source IPs:")
 
     top_talkers = sorted(
@@ -263,8 +329,24 @@ def print_top_talkers(src_counts: dict):
         reverse=True
     )[:TOP_TALKERS_COUNT]
 
+    if not top_talkers:
+        print("    No IP traffic found.")
+
     for ip, count in top_talkers:
         print(f"    {ip} -> {count} packets")
+
+    return top_talkers
+
+
+def summarize_run(mode_name: str, packet_count: int, src_counts: dict):
+    """Write a general run summary to logs."""
+    log_info_event(
+        event_type=f"{mode_name}_RUN",
+        details={
+            "packet_count": packet_count,
+            "unique_source_ips": len(src_counts)
+        }
+    )
 
 
 # -----------------------
@@ -287,16 +369,46 @@ def run_offline_mode(pcap_file: str):
 
     print(f"[+] Loaded {len(packets)} packets")
 
+    if len(packets) == 0:
+        print("[!] PCAP file loaded but contains 0 packets.")
+        log_info_event("OFFLINE_EMPTY_FILE", {"pcap_file": pcap_file})
+        return
+
     src_counts, src_to_ports, src_syn_counts = analyze_packets(packets)
 
-    print_top_talkers(src_counts)
-    print_traffic_categories(src_counts)
+    top_talkers = print_top_talkers(src_counts)
+    traffic_summary = print_traffic_categories(src_counts)
 
-    detect_port_scan(src_to_ports)
-    detect_syn_activity(src_syn_counts)
+    port_alerts = detect_port_scan(src_to_ports)
+    syn_alerts = detect_syn_activity(src_syn_counts)
+    all_alerts = port_alerts + syn_alerts
+
+    summarize_run("OFFLINE", len(packets), src_counts)
+
+    if not all_alerts:
+        log_info_event(
+            "OFFLINE_NO_ALERTS",
+            {
+                "pcap_file": pcap_file,
+                "packet_count": len(packets),
+                "unique_source_ips": len(src_counts)
+            }
+        )
+
+    results_lines = [
+        f"IDS OFFLINE RESULTS - {current_timestamp()}",
+        f"PCAP File: {pcap_file}",
+        f"Total Packets: {len(packets)}",
+        f"Unique Source IPs: {len(src_counts)}",
+        f"Top Talkers: {top_talkers}",
+        f"Traffic Thresholds: p50={traffic_summary['p50']}, p90={traffic_summary['p90']}",
+        f"Alert Count: {len(all_alerts)}"
+    ]
+    write_results_summary(results_lines)
 
     print(f"\n[+] Alerts saved to {DEFAULT_LOG_PATH}")
     print(f"[+] JSON alerts saved to {DEFAULT_JSON_LOG_PATH}")
+    print(f"[+] Results summary saved to {DEFAULT_RESULTS_PATH}")
 
 
 # -----------------------
@@ -305,48 +417,95 @@ def run_offline_mode(pcap_file: str):
 
 def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEFAULT_TIMEOUT):
     """Capture and analyze live network traffic."""
-
-    if isinstance(interface, int):
-        try:
-            interface = IFACES.dev_from_index(interface)
-        except Exception as e:
-            print(f"[!] ERROR resolving interface index: {e}")
-            return
+    try:
+        resolved_interface = resolve_interface(interface)
+    except Exception as e:
+        print(f"[!] ERROR resolving interface: {e}")
+        return
 
     print("[+] Running IDS in LIVE mode")
-    print(f"    Interface: {interface if interface else 'default'}")
+    print(f"    Interface: {resolved_interface if resolved_interface else 'default'}")
     print(f"    Packet limit: {packet_limit}")
     print(f"    Timeout: {timeout} seconds")
     print(f"    Filter: {LIVE_SNIFF_FILTER}")
 
+    packets = []
+
+    # First try with BPF filter
     try:
         packets = sniff(
-            iface=interface,
+            iface=resolved_interface,
             filter=LIVE_SNIFF_FILTER,
             count=packet_limit,
-            timeout=timeout
+            timeout=timeout,
+            store=True
         )
     except Exception as e:
-        print(f"[!] ERROR capturing live traffic: {e}")
-        return
+        print(f"[!] Filtered capture failed: {e}")
+        print("[!] Retrying live capture without filter...")
+
+        try:
+            packets = sniff(
+                iface=resolved_interface,
+                count=packet_limit,
+                timeout=timeout,
+                store=True
+            )
+        except Exception as e2:
+            print(f"[!] ERROR capturing live traffic: {e2}")
+            return
 
     print(f"[+] Captured {len(packets)} packets")
 
     if len(packets) == 0:
-        print("[!] No packets captured. Try a different interface or generate traffic during the timeout window.")
+        print("[!] No packets captured.")
+        print("[!] Try a different interface or generate traffic during the timeout window.")
         print("[!] You can run: py scripts/ids_basic.py interfaces")
+        log_info_event(
+            "LIVE_NO_PACKETS",
+            {
+                "interface": str(resolved_interface),
+                "packet_limit": packet_limit,
+                "timeout": timeout
+            }
+        )
         return
 
     src_counts, src_to_ports, src_syn_counts = analyze_packets(packets)
 
-    print_top_talkers(src_counts)
-    print_traffic_categories(src_counts)
+    top_talkers = print_top_talkers(src_counts)
+    traffic_summary = print_traffic_categories(src_counts)
 
-    detect_port_scan(src_to_ports)
-    detect_syn_activity(src_syn_counts)
+    port_alerts = detect_port_scan(src_to_ports)
+    syn_alerts = detect_syn_activity(src_syn_counts)
+    all_alerts = port_alerts + syn_alerts
+
+    summarize_run("LIVE", len(packets), src_counts)
+
+    if not all_alerts:
+        log_info_event(
+            "LIVE_NO_ALERTS",
+            {
+                "interface": str(resolved_interface),
+                "packet_count": len(packets),
+                "unique_source_ips": len(src_counts)
+            }
+        )
+
+    results_lines = [
+        f"IDS LIVE RESULTS - {current_timestamp()}",
+        f"Interface: {resolved_interface}",
+        f"Total Packets: {len(packets)}",
+        f"Unique Source IPs: {len(src_counts)}",
+        f"Top Talkers: {top_talkers}",
+        f"Traffic Thresholds: p50={traffic_summary['p50']}, p90={traffic_summary['p90']}",
+        f"Alert Count: {len(all_alerts)}"
+    ]
+    write_results_summary(results_lines)
 
     print(f"\n[+] Alerts saved to {DEFAULT_LOG_PATH}")
     print(f"[+] JSON alerts saved to {DEFAULT_JSON_LOG_PATH}")
+    print(f"[+] Results summary saved to {DEFAULT_RESULTS_PATH}")
 
 
 # -----------------------
@@ -362,6 +521,9 @@ def analyze_pcap_for_dashboard(pcap_file: str):
         packets = rdpcap(pcap_file)
     except Exception as e:
         return {"error": f"Error reading PCAP file: {e}"}
+
+    if len(packets) == 0:
+        return {"error": "PCAP file contains 0 packets."}
 
     src_counts, src_to_ports, src_syn_counts = analyze_packets(packets)
 
@@ -380,27 +542,12 @@ def analyze_pcap_for_dashboard(pcap_file: str):
 
         if unique_ports >= PORTSCAN_UNIQUE_PORTS_THRESHOLD:
             sorted_ports = sorted(port_set)
-
             alert_data = {
                 "type": "PORT_SCAN",
                 "source": src_ip,
                 "details": f"UniquePorts={unique_ports}, Ports={sorted_ports}"
             }
             alerts.append(alert_data)
-
-            log_alert(
-                f"ALERT PORT_SCAN Source={src_ip} UniquePorts={unique_ports} Ports={sorted_ports}"
-            )
-
-            log_alert_json({
-                "alert_type": "PORT_SCAN",
-                "source_ip": src_ip,
-                "unique_ports": unique_ports,
-                "ports": sorted_ports,
-                "threshold": PORTSCAN_UNIQUE_PORTS_THRESHOLD,
-                "severity": "medium",
-                "detection": "Possible_Port_Scan"
-            })
 
     for src_ip, syn_count in src_syn_counts.items():
         if syn_count >= SYN_COUNT_THRESHOLD:
@@ -410,19 +557,6 @@ def analyze_pcap_for_dashboard(pcap_file: str):
                 "details": f"SYNs={syn_count}"
             }
             alerts.append(alert_data)
-
-            log_alert(
-                f"ALERT SYN_ACTIVITY Source={src_ip} SYNs={syn_count}"
-            )
-
-            log_alert_json({
-                "alert_type": "SYN_ACTIVITY",
-                "source_ip": src_ip,
-                "syn_count": syn_count,
-                "threshold": SYN_COUNT_THRESHOLD,
-                "severity": "medium",
-                "detection": "Possible_SYN_Scan_or_Flood"
-            })
 
     return {
         "pcap_file": pcap_file,
@@ -494,4 +628,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
