@@ -21,8 +21,8 @@ import numpy as np
 # SETTINGS / CONSTANTS
 # -----------------------
 
-PORTSCAN_UNIQUE_PORTS_THRESHOLD = 3   # >= 3 unique ports -> possible scan
-SYN_COUNT_THRESHOLD = 5             # >= 5 SYN packets -> suspicious
+PORTSCAN_UNIQUE_PORTS_THRESHOLD = 1   # >= 3 unique ports -> possible scan
+SYN_COUNT_THRESHOLD = 1             # >= 5 SYN packets -> suspicious
 TOP_TALKERS_COUNT = 5                 # show top 5 source IPs
 TOP_CATEGORY_DISPLAY_COUNT = 3        # show top 3 IPs in each traffic category
 DEFAULT_PACKET_LIMIT = 200
