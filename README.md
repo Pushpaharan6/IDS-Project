@@ -118,7 +118,8 @@ The project includes a basic Flask web dashboard with a dark cyber-style interfa
 Note: The dashboard runs locally and is available only while the Flask server is active.
 
 ## Live Capture Reliability on Windows
-I improved live capture reliability by adding interface listing, adapter selection, and better capture handling on Windows. Live capture works better, but Windows virtual adapter capture is still inconsistent, so offline PCAP analysis is the most reliable method in the current version.
+
+Live capture reliability on Windows was improved by adding interface listing, adapter index selection, and better troubleshooting for virtual adapters. The correct VirtualBox Host-Only adapter can now be identified more reliably during testing. However, live capture of scan traffic on Windows virtual adapters is still not fully consistent in all cases, so offline PCAP analysis remains the most reliable validated workflow in the current version.
 
 ## Future Improvements
 
