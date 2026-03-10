@@ -117,13 +117,16 @@ The project includes a basic Flask web dashboard with a dark cyber-style interfa
 
 Note: The dashboard runs locally and is available only while the Flask server is active.
 
+## Live Capture Reliability on Windows
+I improved live capture reliability by adding interface listing, adapter selection, and better capture handling on Windows. Live capture works better, but Windows virtual adapter capture is still inconsistent, so offline PCAP analysis is the most reliable method in the current version.
+
 ## Future Improvements
 
-  Machine learning anomaly detection  
-  Real-time network visualization  
-  Integration with SIEM systems
-  Improve live capture reliability on Windows virtual adapters
-  Add charts and visual analytics to the dashboard
-  Add downloadable CSV/TXT reports
-  Add more detection rules
-  Improve alert severity levels
+  - Machine learning anomaly detection  
+  - Real-time network visualization  
+  - Integration with SIEM systems
+  - Improve live capture reliability on Windows virtual adapters
+  - Add charts and visual analytics to the dashboard
+  - Add downloadable CSV/TXT reports
+  - Add more detection rules
+  - Improve alert severity levels
