@@ -1,13 +1,15 @@
 """
 ids_basic.py
 Offline + Live Intrusion Detection System (IDS)
-PCAP analysis + live packet sniffing with detection rules, logging, and NumPy traffic categorization
+PCAP analysis + live packet sniffing with detection rules, logging,
+NumPy traffic categorization, and SIEM-friendly JSON logging
 
 Author: Pushpaharan
 """
 
 import os
 import sys
+import json
 from datetime import datetime
 from collections import defaultdict
 
@@ -19,13 +21,15 @@ import numpy as np
 # SETTINGS / CONSTANTS
 # -----------------------
 
-PORTSCAN_UNIQUE_PORTS_THRESHOLD = 3  # >= 10 unique ports -> possible scan
-SYN_COUNT_THRESHOLD = 5              # >= 20 SYN packets -> suspicious
-TOP_TALKERS_COUNT = 5                  # show top 5 source IPs
-TOP_CATEGORY_DISPLAY_COUNT = 3         # show top 3 IPs in each traffic category
+PORTSCAN_UNIQUE_PORTS_THRESHOLD = 3   # >= 3 unique ports -> possible scan
+SYN_COUNT_THRESHOLD = 5             # >= 5 SYN packets -> suspicious
+TOP_TALKERS_COUNT = 5                 # show top 5 source IPs
+TOP_CATEGORY_DISPLAY_COUNT = 3        # show top 3 IPs in each traffic category
 DEFAULT_PACKET_LIMIT = 200
 DEFAULT_TIMEOUT = 30
 DEFAULT_LOG_PATH = "logs/alerts.log"
+DEFAULT_JSON_LOG_PATH = "logs/alerts.jsonl"
+LIVE_SNIFF_FILTER = "tcp"
 
 
 # -----------------------
@@ -33,7 +37,7 @@ DEFAULT_LOG_PATH = "logs/alerts.log"
 # -----------------------
 
 def log_alert(message: str, log_path: str = DEFAULT_LOG_PATH):
-    """Write alerts to logs/alerts.log with timestamp."""
+    """Write alerts to text log with timestamp."""
     try:
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -43,6 +47,22 @@ def log_alert(message: str, log_path: str = DEFAULT_LOG_PATH):
 
     except Exception as e:
         print(f"[!] ERROR writing to log file: {e}")
+
+
+def log_alert_json(alert_data: dict, log_path: str = DEFAULT_JSON_LOG_PATH):
+    """Write structured alert data in JSON lines format for SIEM-style ingestion."""
+    try:
+        os.makedirs(os.path.dirname(log_path), exist_ok=True)
+
+        alert_record = alert_data.copy()
+        alert_record["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(alert_record) + "\n")
+
+    except Exception as e:
+        print(f"[!] ERROR writing JSON alert log: {e}")
+
 
 # -----------------------
 # INTERFACES
@@ -61,7 +81,7 @@ def list_interfaces():
         except Exception:
             print(f"    {iface}")
 
-            
+
 # -----------------------
 # DETECTION RULES
 # -----------------------
@@ -93,6 +113,16 @@ def detect_port_scan(src_to_ports: dict):
             print("[!]", alert_msg)
             log_alert(alert_msg)
 
+            log_alert_json({
+                "alert_type": "PORT_SCAN",
+                "source_ip": src_ip,
+                "unique_ports": unique_ports,
+                "ports": sorted_ports,
+                "threshold": PORTSCAN_UNIQUE_PORTS_THRESHOLD,
+                "severity": "medium",
+                "detection": "Possible_Port_Scan"
+            })
+
     if not detected:
         print("[+] No port scan behavior detected.")
 
@@ -119,6 +149,15 @@ def detect_syn_activity(src_syn_counts: dict):
 
             print("[!]", alert_msg)
             log_alert(alert_msg)
+
+            log_alert_json({
+                "alert_type": "SYN_ACTIVITY",
+                "source_ip": src_ip,
+                "syn_count": syn_count,
+                "threshold": SYN_COUNT_THRESHOLD,
+                "severity": "medium",
+                "detection": "Possible_SYN_Scan_or_Flood"
+            })
 
     if not detected:
         print("[+] No suspicious SYN activity detected.")
@@ -257,6 +296,7 @@ def run_offline_mode(pcap_file: str):
     detect_syn_activity(src_syn_counts)
 
     print(f"\n[+] Alerts saved to {DEFAULT_LOG_PATH}")
+    print(f"[+] JSON alerts saved to {DEFAULT_JSON_LOG_PATH}")
 
 
 # -----------------------
@@ -277,14 +317,25 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
     print(f"    Interface: {interface if interface else 'default'}")
     print(f"    Packet limit: {packet_limit}")
     print(f"    Timeout: {timeout} seconds")
+    print(f"    Filter: {LIVE_SNIFF_FILTER}")
 
     try:
-        packets = sniff(iface=interface, count=packet_limit, timeout=timeout)
+        packets = sniff(
+            iface=interface,
+            filter=LIVE_SNIFF_FILTER,
+            count=packet_limit,
+            timeout=timeout
+        )
     except Exception as e:
         print(f"[!] ERROR capturing live traffic: {e}")
         return
 
     print(f"[+] Captured {len(packets)} packets")
+
+    if len(packets) == 0:
+        print("[!] No packets captured. Try a different interface or generate traffic during the timeout window.")
+        print("[!] You can run: py scripts/ids_basic.py interfaces")
+        return
 
     src_counts, src_to_ports, src_syn_counts = analyze_packets(packets)
 
@@ -295,6 +346,7 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
     detect_syn_activity(src_syn_counts)
 
     print(f"\n[+] Alerts saved to {DEFAULT_LOG_PATH}")
+    print(f"[+] JSON alerts saved to {DEFAULT_JSON_LOG_PATH}")
 
 
 # -----------------------
@@ -325,20 +377,51 @@ def analyze_pcap_for_dashboard(pcap_file: str):
 
     for src_ip, port_set in src_to_ports.items():
         unique_ports = len(port_set)
+
         if unique_ports >= PORTSCAN_UNIQUE_PORTS_THRESHOLD:
             sorted_ports = sorted(port_set)
-            alerts.append({
+
+            alert_data = {
                 "type": "PORT_SCAN",
                 "source": src_ip,
                 "details": f"UniquePorts={unique_ports}, Ports={sorted_ports}"
+            }
+            alerts.append(alert_data)
+
+            log_alert(
+                f"ALERT PORT_SCAN Source={src_ip} UniquePorts={unique_ports} Ports={sorted_ports}"
+            )
+
+            log_alert_json({
+                "alert_type": "PORT_SCAN",
+                "source_ip": src_ip,
+                "unique_ports": unique_ports,
+                "ports": sorted_ports,
+                "threshold": PORTSCAN_UNIQUE_PORTS_THRESHOLD,
+                "severity": "medium",
+                "detection": "Possible_Port_Scan"
             })
 
     for src_ip, syn_count in src_syn_counts.items():
         if syn_count >= SYN_COUNT_THRESHOLD:
-            alerts.append({
+            alert_data = {
                 "type": "SYN_ACTIVITY",
                 "source": src_ip,
                 "details": f"SYNs={syn_count}"
+            }
+            alerts.append(alert_data)
+
+            log_alert(
+                f"ALERT SYN_ACTIVITY Source={src_ip} SYNs={syn_count}"
+            )
+
+            log_alert_json({
+                "alert_type": "SYN_ACTIVITY",
+                "source_ip": src_ip,
+                "syn_count": syn_count,
+                "threshold": SYN_COUNT_THRESHOLD,
+                "severity": "medium",
+                "detection": "Possible_SYN_Scan_or_Flood"
             })
 
     return {
@@ -411,3 +494,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
