@@ -19,8 +19,8 @@ import numpy as np
 # SETTINGS / CONSTANTS
 # -----------------------
 
-PORTSCAN_UNIQUE_PORTS_THRESHOLD = 10   # >= 10 unique ports -> possible scan
-SYN_COUNT_THRESHOLD = 20               # >= 20 SYN packets -> suspicious
+PORTSCAN_UNIQUE_PORTS_THRESHOLD = 3  # >= 10 unique ports -> possible scan
+SYN_COUNT_THRESHOLD = 5              # >= 20 SYN packets -> suspicious
 TOP_TALKERS_COUNT = 5                  # show top 5 source IPs
 TOP_CATEGORY_DISPLAY_COUNT = 3         # show top 3 IPs in each traffic category
 DEFAULT_PACKET_LIMIT = 200
@@ -44,7 +44,24 @@ def log_alert(message: str, log_path: str = DEFAULT_LOG_PATH):
     except Exception as e:
         print(f"[!] ERROR writing to log file: {e}")
 
+# -----------------------
+# INTERFACES
+# -----------------------
 
+def list_interfaces():
+    """Show interfaces that Scapy can capture from."""
+    print("\n[+] Available capture interfaces:")
+    for iface in IFACES.values():
+        try:
+            print(
+                f"    Index={iface.index} "
+                f"Name={iface.name} "
+                f"Description={getattr(iface, 'description', 'N/A')}"
+            )
+        except Exception:
+            print(f"    {iface}")
+
+            
 # -----------------------
 # DETECTION RULES
 # -----------------------
@@ -354,9 +371,15 @@ def main():
         print("    py scripts/ids_basic.py live <interface>")
         print("    py scripts/ids_basic.py live <interface> <packet_limit> <timeout>")
         print("    py scripts/ids_basic.py live 3 500 60")
+        print("\n  Interface list:")
+        print("    py scripts/ids_basic.py interfaces")
         return
 
     mode = sys.argv[1].lower()
+
+    if mode == "interfaces":
+        list_interfaces()
+        return
 
     if mode == "offline":
         if len(sys.argv) < 3:
@@ -383,7 +406,7 @@ def main():
         run_live_mode(interface, packet_limit, timeout)
 
     else:
-        print("[!] Unknown mode. Use 'offline' or 'live'.")
+        print("[!] Unknown mode. Use 'offline', 'live', or 'interfaces'.")
 
 
 if __name__ == "__main__":
