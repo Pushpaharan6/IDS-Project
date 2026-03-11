@@ -1,5 +1,5 @@
-IDS OFFLINE RESULTS - 2026-03-11 01:08:57
-PCAP File: captures\kali_portscan.pcapng
+IDS OFFLINE RESULTS - 2026-03-11 22:12:40
+PCAP File: uploads/kali_portscan.pcapng
 Total Packets: 12619
 Unique Source IPs: 3
 Top Talkers: [('212.102.46.24', 9399), ('192.168.8.137', 3206), ('192.168.8.160', 4)]

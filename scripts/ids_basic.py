@@ -13,7 +13,7 @@ import json
 from datetime import datetime
 from collections import defaultdict
 
-from scapy.all import rdpcap, sniff, IP, TCP, IFACES
+from scapy.all import rdpcap, sniff, wrpcap, IP, TCP, IFACES
 import numpy as np
 
 
@@ -21,8 +21,8 @@ import numpy as np
 # SETTINGS / CONSTANTS
 # -----------------------
 
-PORTSCAN_UNIQUE_PORTS_THRESHOLD = 1  # >= 3 unique ports -> possible scan
-SYN_COUNT_THRESHOLD = 1              # >= 5 SYN packets -> suspicious
+PORTSCAN_UNIQUE_PORTS_THRESHOLD = 1   # >= 1 unique port -> test alert generation
+SYN_COUNT_THRESHOLD = 1               # >= 1 SYN packet -> test alert generation
 TOP_TALKERS_COUNT = 5                 # show top 5 source IPs
 TOP_CATEGORY_DISPLAY_COUNT = 3        # show top 3 IPs in each traffic category
 DEFAULT_PACKET_LIMIT = 200
@@ -31,8 +31,8 @@ DEFAULT_LOG_PATH = "logs/alerts.log"
 DEFAULT_JSON_LOG_PATH = "logs/alerts.jsonl"
 DEFAULT_RESULTS_PATH = "logs/ids_results.txt"
 
-# Use TCP for normal live capture. If this fails or captures 0, code falls back without filter.
-LIVE_SNIFF_FILTER = "tcp"
+# Set to None for easier Windows/VirtualBox live testing
+LIVE_SNIFF_FILTER = None
 
 
 # -----------------------
@@ -111,10 +111,7 @@ def list_interfaces():
 
 
 def resolve_interface(interface):
-    """
-    Convert an interface index to a Scapy interface object if needed.
-    Keep strings as-is.
-    """
+    """Convert an interface index to a Scapy interface object if needed."""
     if interface is None:
         return None
 
@@ -252,7 +249,7 @@ def categorize_traffic_numpy(src_counts: dict):
 
 
 def print_traffic_categories(src_counts: dict):
-    """Display NumPy-based traffic categories and return summary text lines."""
+    """Display NumPy-based traffic categories and return summary info."""
     low, medium, high, p50, p90 = categorize_traffic_numpy(src_counts)
 
     print("\n[+] Traffic Categories:")
@@ -309,11 +306,9 @@ def analyze_packets(packets):
                     syn_flag = 0x02
                     ack_flag = 0x10
 
-                    # Count SYN packets without ACK
                     if (flags & syn_flag) and not (flags & ack_flag):
                         src_syn_counts[src_ip] += 1
         except Exception:
-            # Skip malformed packet instead of crashing
             continue
 
     return src_counts, src_to_ports, src_syn_counts
@@ -424,38 +419,40 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
         return
 
     print("[+] Running IDS in LIVE mode")
-    print(f"    Interface: {resolved_interface if resolved_interface else 'default'}")
+    print(f"    Interface: {interface if interface else 'default'}")
+    print(f"    Resolved interface: {resolved_interface}")
     print(f"    Packet limit: {packet_limit}")
     print(f"    Timeout: {timeout} seconds")
     print(f"    Filter: {LIVE_SNIFF_FILTER}")
 
     packets = []
 
-    # First try with BPF filter
     try:
-        packets = sniff(
-            iface=resolved_interface,
-            filter=LIVE_SNIFF_FILTER,
-            count=packet_limit,
-            timeout=timeout,
-            store=True
-        )
-    except Exception as e:
-        print(f"[!] Filtered capture failed: {e}")
-        print("[!] Retrying live capture without filter...")
-
-        try:
+        if LIVE_SNIFF_FILTER:
+            packets = sniff(
+                iface=resolved_interface,
+                filter=LIVE_SNIFF_FILTER,
+                count=packet_limit,
+                timeout=timeout,
+                store=True
+            )
+        else:
             packets = sniff(
                 iface=resolved_interface,
                 count=packet_limit,
                 timeout=timeout,
                 store=True
             )
-        except Exception as e2:
-            print(f"[!] ERROR capturing live traffic: {e2}")
-            return
+    except Exception as e:
+        print(f"[!] ERROR capturing live traffic: {e}")
+        return
 
     print(f"[+] Captured {len(packets)} packets")
+
+    if len(packets) > 0:
+        os.makedirs("captures", exist_ok=True)
+        wrpcap("captures/live_debug_capture.pcapng", packets)
+        print("[+] Saved live debug capture to captures/live_debug_capture.pcapng")
 
     if len(packets) == 0:
         print("[!] No packets captured.")
@@ -472,6 +469,10 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
         return
 
     src_counts, src_to_ports, src_syn_counts = analyze_packets(packets)
+
+    print(f"[+] Unique source IPs found: {len(src_counts)}")
+    print(f"[+] TCP source entries found: {len(src_to_ports)}")
+    print(f"[+] SYN source entries found: {len(src_syn_counts)}")
 
     top_talkers = print_top_talkers(src_counts)
     traffic_summary = print_traffic_categories(src_counts)
