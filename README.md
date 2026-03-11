@@ -56,10 +56,9 @@ pip install scapy numpy
 ## Running the IDS
 
 ## Offline mode 
-py scripts/ids_basic.py offline captures/sample_traffic.pcap
+py scripts/ids_basic.py offline uploads/kali_portscan.pcapng
 
 ## Live mode 
-py scripts/ids_basic.py live
 py scripts\ids_basic.py live 3 500 60
 
 ## Web Dashboard
