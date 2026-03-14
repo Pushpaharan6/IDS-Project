@@ -14,3 +14,9 @@
 {"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-03-11 23:26:47"}
 {"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-03-11 23:37:18"}
 {"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-03-11 23:59:07"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-03-14 23:30:31"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "uploads/kali_portscan.pcapng", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-03-14 23:30:31"}
+{"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-03-14 23:31:50"}
+{"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-03-14 23:34:43"}
+{"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-03-14 23:38:31"}
+{"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-03-14 23:39:49"}

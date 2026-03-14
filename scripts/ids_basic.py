@@ -17,9 +17,9 @@ from scapy.all import rdpcap, sniff, wrpcap, IP, TCP, IFACES
 import numpy as np
 
 
-# -----------------------
+
 # SETTINGS / CONSTANTS
-# -----------------------
+
 
 PORTSCAN_UNIQUE_PORTS_THRESHOLD = 1   # >= 1 unique port -> test alert generation
 SYN_COUNT_THRESHOLD = 1               # >= 1 SYN packet -> test alert generation
@@ -35,9 +35,9 @@ DEFAULT_RESULTS_PATH = "logs/ids_results.txt"
 LIVE_SNIFF_FILTER = None
 
 
-# -----------------------
+
 # LOGGING
-# -----------------------
+
 
 def current_timestamp() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -92,9 +92,9 @@ def write_results_summary(lines, results_path: str = DEFAULT_RESULTS_PATH):
         print(f"[!] ERROR writing results summary: {e}")
 
 
-# -----------------------
+
 # INTERFACES
-# -----------------------
+
 
 def list_interfaces():
     """Show interfaces that Scapy can capture from."""
@@ -124,9 +124,9 @@ def resolve_interface(interface):
     return interface
 
 
-# -----------------------
+
 # DETECTION RULES
-# -----------------------
+
 
 def detect_port_scan(src_to_ports: dict):
     """
@@ -214,9 +214,9 @@ def detect_syn_activity(src_syn_counts: dict):
     return alerts
 
 
-# -----------------------
+
 # NUMPY TRAFFIC ANALYSIS
-# -----------------------
+
 
 def categorize_traffic_numpy(src_counts: dict):
     """
@@ -278,9 +278,9 @@ def print_traffic_categories(src_counts: dict):
     }
 
 
-# -----------------------
+
 # SHARED PACKET ANALYSIS
-# -----------------------
+
 
 def analyze_packets(packets):
     """
@@ -344,9 +344,9 @@ def summarize_run(mode_name: str, packet_count: int, src_counts: dict):
     )
 
 
-# -----------------------
+
 # OFFLINE MODE
-# -----------------------
+
 
 def run_offline_mode(pcap_file: str):
     """Analyze packets from a saved PCAP/PCAPNG file."""
@@ -406,9 +406,9 @@ def run_offline_mode(pcap_file: str):
     print(f"[+] Results summary saved to {DEFAULT_RESULTS_PATH}")
 
 
-# -----------------------
+
 # LIVE MODE
-# -----------------------
+
 
 def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEFAULT_TIMEOUT):
     """Capture and analyze live network traffic."""
@@ -509,9 +509,9 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
     print(f"[+] Results summary saved to {DEFAULT_RESULTS_PATH}")
 
 
-# -----------------------
+
 # DASHBOARD SUPPORT
-# -----------------------
+
 
 def analyze_pcap_for_dashboard(pcap_file: str):
     """Return IDS results as a dictionary for Flask dashboard."""
@@ -574,9 +574,9 @@ def analyze_pcap_for_dashboard(pcap_file: str):
     }
 
 
-# -----------------------
+
 # MAIN PROGRAM
-# -----------------------
+
 
 def main():
     if len(sys.argv) < 2:
