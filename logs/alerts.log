@@ -213,3 +213,6 @@
 2026-03-14 23:38:31 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
 2026-03-14 23:39:49 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
 2026-03-15 05:21:46 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
+2026-03-17 15:59:43 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-03-17 15:59:43 INFO OFFLINE_NO_ALERTS pcap_file=uploads/kali_portscan.pcapng packet_count=12619 unique_source_ips=3
+2026-03-17 16:05:00 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
