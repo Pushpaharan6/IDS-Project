@@ -24,3 +24,15 @@
 {"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-03-17 15:59:43"}
 {"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "uploads/kali_portscan.pcapng", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-03-17 15:59:43"}
 {"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-03-17 16:05:00"}
+{"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-04-04 13:28:13"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 13:28:56"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "uploads/kali_portscan.pcapng", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 13:28:56"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 9, "unique_source_ips": 9, "timestamp": "2026-04-04 14:37:57"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures\\geotest.pcap", "packet_count": 9, "unique_source_ips": 9, "timestamp": "2026-04-04 14:37:57"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 14:38:42"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures\\kali_portscan.pcapng", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 14:38:42"}
+{"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-04-04 14:47:45"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 18:52:12"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures\\kali_portscan.pcapng", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 18:52:12"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 19:07:24"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures\\kali_portscan.pcapng", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 19:07:24"}

@@ -216,3 +216,15 @@
 2026-03-17 15:59:43 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
 2026-03-17 15:59:43 INFO OFFLINE_NO_ALERTS pcap_file=uploads/kali_portscan.pcapng packet_count=12619 unique_source_ips=3
 2026-03-17 16:05:00 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
+2026-04-04 13:28:13 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
+2026-04-04 13:28:56 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-04 13:28:56 INFO OFFLINE_NO_ALERTS pcap_file=uploads/kali_portscan.pcapng packet_count=12619 unique_source_ips=3
+2026-04-04 14:37:57 INFO OFFLINE_RUN packet_count=9 unique_source_ips=9
+2026-04-04 14:37:57 INFO OFFLINE_NO_ALERTS pcap_file=captures\geotest.pcap packet_count=9 unique_source_ips=9
+2026-04-04 14:38:42 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-04 14:38:42 INFO OFFLINE_NO_ALERTS pcap_file=captures\kali_portscan.pcapng packet_count=12619 unique_source_ips=3
+2026-04-04 14:47:45 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
+2026-04-04 18:52:12 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-04 18:52:12 INFO OFFLINE_NO_ALERTS pcap_file=captures\kali_portscan.pcapng packet_count=12619 unique_source_ips=3
+2026-04-04 19:07:24 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-04 19:07:24 INFO OFFLINE_NO_ALERTS pcap_file=captures\kali_portscan.pcapng packet_count=12619 unique_source_ips=3

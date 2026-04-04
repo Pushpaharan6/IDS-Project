@@ -17,14 +17,16 @@ from scapy.all import rdpcap, sniff, wrpcap, IP, TCP, IFACES
 import numpy as np
 
 
-
+# -----------------------
 # SETTINGS / CONSTANTS
+# -----------------------
 
+PORTSCAN_UNIQUE_PORTS_THRESHOLD = 1   # testing threshold
+SYN_COUNT_THRESHOLD = 5               # testing threshold
+HIGH_TRAFFIC_PACKET_THRESHOLD = 100   # high traffic anomaly threshold
 
-PORTSCAN_UNIQUE_PORTS_THRESHOLD = 1   # >= 1 unique port -> test alert generation
-SYN_COUNT_THRESHOLD = 1               # >= 1 SYN packet -> test alert generation
-TOP_TALKERS_COUNT = 5                 # show top 5 source IPs
-TOP_CATEGORY_DISPLAY_COUNT = 3        # show top 3 IPs in each traffic category
+TOP_TALKERS_COUNT = 5
+TOP_CATEGORY_DISPLAY_COUNT = 3
 DEFAULT_PACKET_LIMIT = 200
 DEFAULT_TIMEOUT = 30
 DEFAULT_LOG_PATH = "logs/alerts.log"
@@ -35,9 +37,9 @@ DEFAULT_RESULTS_PATH = "logs/ids_results.txt"
 LIVE_SNIFF_FILTER = None
 
 
-
+# -----------------------
 # LOGGING
-
+# -----------------------
 
 def current_timestamp() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -92,9 +94,9 @@ def write_results_summary(lines, results_path: str = DEFAULT_RESULTS_PATH):
         print(f"[!] ERROR writing results summary: {e}")
 
 
-
+# -----------------------
 # INTERFACES
-
+# -----------------------
 
 def list_interfaces():
     """Show interfaces that Scapy can capture from."""
@@ -124,9 +126,9 @@ def resolve_interface(interface):
     return interface
 
 
-
+# -----------------------
 # DETECTION RULES
-
+# -----------------------
 
 def detect_port_scan(src_to_ports: dict):
     """
@@ -214,9 +216,49 @@ def detect_syn_activity(src_syn_counts: dict):
     return alerts
 
 
+def detect_high_traffic(src_counts: dict):
+    """
+    Rule C: High traffic anomaly detection
+    Detects unusually high packet counts from a single source IP.
+    Returns a list of alert dictionaries.
+    """
+    print("\n[+] High Traffic Check (packet count per source):")
+    alerts = []
 
+    for src_ip, packet_count in src_counts.items():
+        if packet_count >= HIGH_TRAFFIC_PACKET_THRESHOLD:
+            alert_msg = (
+                f"ALERT HIGH_TRAFFIC "
+                f"Source={src_ip} "
+                f"Packets={packet_count} "
+                f"Threshold={HIGH_TRAFFIC_PACKET_THRESHOLD} "
+                f"Detection=Possible_Traffic_Anomaly"
+            )
+
+            print("[!]", alert_msg)
+            log_alert(alert_msg)
+
+            alert_record = {
+                "record_type": "ALERT",
+                "alert_type": "HIGH_TRAFFIC",
+                "source_ip": src_ip,
+                "packet_count": packet_count,
+                "threshold": HIGH_TRAFFIC_PACKET_THRESHOLD,
+                "severity": "medium",
+                "detection": "Possible_Traffic_Anomaly"
+            }
+            log_alert_json(alert_record)
+            alerts.append(alert_record)
+
+    if not alerts:
+        print("[+] No high traffic anomaly detected.")
+
+    return alerts
+
+
+# -----------------------
 # NUMPY TRAFFIC ANALYSIS
-
+# -----------------------
 
 def categorize_traffic_numpy(src_counts: dict):
     """
@@ -278,9 +320,9 @@ def print_traffic_categories(src_counts: dict):
     }
 
 
-
+# -----------------------
 # SHARED PACKET ANALYSIS
-
+# -----------------------
 
 def analyze_packets(packets):
     """
@@ -344,9 +386,9 @@ def summarize_run(mode_name: str, packet_count: int, src_counts: dict):
     )
 
 
-
+# -----------------------
 # OFFLINE MODE
-
+# -----------------------
 
 def run_offline_mode(pcap_file: str):
     """Analyze packets from a saved PCAP/PCAPNG file."""
@@ -376,7 +418,8 @@ def run_offline_mode(pcap_file: str):
 
     port_alerts = detect_port_scan(src_to_ports)
     syn_alerts = detect_syn_activity(src_syn_counts)
-    all_alerts = port_alerts + syn_alerts
+    high_traffic_alerts = detect_high_traffic(src_counts)
+    all_alerts = port_alerts + syn_alerts + high_traffic_alerts
 
     summarize_run("OFFLINE", len(packets), src_counts)
 
@@ -406,9 +449,9 @@ def run_offline_mode(pcap_file: str):
     print(f"[+] Results summary saved to {DEFAULT_RESULTS_PATH}")
 
 
-
+# -----------------------
 # LIVE MODE
-
+# -----------------------
 
 def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEFAULT_TIMEOUT):
     """Capture and analyze live network traffic."""
@@ -479,7 +522,8 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
 
     port_alerts = detect_port_scan(src_to_ports)
     syn_alerts = detect_syn_activity(src_syn_counts)
-    all_alerts = port_alerts + syn_alerts
+    high_traffic_alerts = detect_high_traffic(src_counts)
+    all_alerts = port_alerts + syn_alerts + high_traffic_alerts
 
     summarize_run("LIVE", len(packets), src_counts)
 
@@ -509,9 +553,9 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
     print(f"[+] Results summary saved to {DEFAULT_RESULTS_PATH}")
 
 
-
+# -----------------------
 # DASHBOARD SUPPORT
-
+# -----------------------
 
 def analyze_pcap_for_dashboard(pcap_file: str):
     """Return IDS results as a dictionary for Flask dashboard."""
@@ -540,24 +584,29 @@ def analyze_pcap_for_dashboard(pcap_file: str):
 
     for src_ip, port_set in src_to_ports.items():
         unique_ports = len(port_set)
-
         if unique_ports >= PORTSCAN_UNIQUE_PORTS_THRESHOLD:
             sorted_ports = sorted(port_set)
-            alert_data = {
+            alerts.append({
                 "type": "PORT_SCAN",
                 "source": src_ip,
                 "details": f"UniquePorts={unique_ports}, Ports={sorted_ports}"
-            }
-            alerts.append(alert_data)
+            })
 
     for src_ip, syn_count in src_syn_counts.items():
         if syn_count >= SYN_COUNT_THRESHOLD:
-            alert_data = {
+            alerts.append({
                 "type": "SYN_ACTIVITY",
                 "source": src_ip,
                 "details": f"SYNs={syn_count}"
-            }
-            alerts.append(alert_data)
+            })
+
+    for src_ip, packet_count in src_counts.items():
+        if packet_count >= HIGH_TRAFFIC_PACKET_THRESHOLD:
+            alerts.append({
+                "type": "HIGH_TRAFFIC",
+                "source": src_ip,
+                "details": f"Packets={packet_count}"
+            })
 
     return {
         "pcap_file": pcap_file,
@@ -574,9 +623,9 @@ def analyze_pcap_for_dashboard(pcap_file: str):
     }
 
 
-
+# -----------------------
 # MAIN PROGRAM
-
+# -----------------------
 
 def main():
     if len(sys.argv) < 2:
