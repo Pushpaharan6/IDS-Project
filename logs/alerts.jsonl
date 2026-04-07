@@ -36,3 +36,6 @@
 {"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures\\kali_portscan.pcapng", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 18:52:12"}
 {"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 19:07:24"}
 {"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures\\kali_portscan.pcapng", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 19:07:24"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "212.102.46.24", "packet_count": 9399, "threshold": 100, "severity": "medium", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-04 19:58:05"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "192.168.8.137", "packet_count": 3206, "threshold": 100, "severity": "medium", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-04 19:58:05"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-04 19:58:05"}

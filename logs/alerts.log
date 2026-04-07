@@ -228,3 +228,6 @@
 2026-04-04 18:52:12 INFO OFFLINE_NO_ALERTS pcap_file=captures\kali_portscan.pcapng packet_count=12619 unique_source_ips=3
 2026-04-04 19:07:24 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
 2026-04-04 19:07:24 INFO OFFLINE_NO_ALERTS pcap_file=captures\kali_portscan.pcapng packet_count=12619 unique_source_ips=3
+2026-04-04 19:58:05 ALERT HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=100 Detection=Possible_Traffic_Anomaly
+2026-04-04 19:58:05 ALERT HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=100 Detection=Possible_Traffic_Anomaly
+2026-04-04 19:58:05 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
