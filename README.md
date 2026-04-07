@@ -120,6 +120,35 @@ Note: The dashboard runs locally and is available only while the Flask server is
 
 Live capture reliability on Windows was improved by adding interface listing, adapter index selection, and better troubleshooting for virtual adapters. The correct VirtualBox Host-Only adapter can now be identified more reliably during testing. However, live capture of scan traffic on Windows virtual adapters is still not fully consistent in all cases, so offline PCAP analysis remains the most reliable validated workflow in the current version.
 
+## Alert Severity Levels
+
+The IDS assigns severity levels to alerts to improve readability and support clearer analysis.
+
+- `PORT_SCAN` -> **HIGH**
+- `SYN_ACTIVITY` -> **MEDIUM**
+- `HIGH_TRAFFIC` -> **LOW**
+
+Severity is shown in text logs, JSON logs, and dashboard alerts.
+
+## Detection Rules
+
+The current IDS uses three main rules:
+
+1. **Port Scan Detection**
+   - Counts how many unique destination TCP ports each source IP contacts
+   - If the count reaches the threshold, a `PORT_SCAN` alert is generated
+   - Severity: **HIGH**
+
+2. **SYN Activity Detection**
+   - Counts TCP SYN packets without ACK for each source IP
+   - If the count reaches the threshold, a `SYN_ACTIVITY` alert is generated
+   - Severity: **MEDIUM**
+
+3. **High Traffic Detection**
+   - Counts how many packets are sent by each source IP
+   - If the count reaches the threshold, a `HIGH_TRAFFIC` alert is generated
+   - Severity: **LOW**
+
 ## Future Improvements
 
   - Machine learning anomaly detection  
