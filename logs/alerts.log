@@ -234,3 +234,15 @@
 2026-04-07 13:00:54 ALERT LOW HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=100 Detection=Possible_Traffic_Anomaly
 2026-04-07 13:00:54 ALERT LOW HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=100 Detection=Possible_Traffic_Anomaly
 2026-04-07 13:00:54 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-20 10:41:30 ALERT LOW HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=100 Detection=Possible_Traffic_Anomaly
+2026-04-20 10:41:30 ALERT LOW HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=100 Detection=Possible_Traffic_Anomaly
+2026-04-20 10:41:30 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-20 10:42:59 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
+2026-04-20 10:53:05 ALERT LOW HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=100 Detection=Possible_Traffic_Anomaly
+2026-04-20 10:53:05 ALERT LOW HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=100 Detection=Possible_Traffic_Anomaly
+2026-04-20 10:53:05 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-20 10:54:30 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
+2026-04-20 10:58:33 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-20 10:58:33 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-20 10:58:33 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-20 10:59:52 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60

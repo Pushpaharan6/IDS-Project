@@ -42,3 +42,15 @@
 {"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "212.102.46.24", "packet_count": 9399, "threshold": 100, "severity": "LOW", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-07 13:00:54"}
 {"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "192.168.8.137", "packet_count": 3206, "threshold": 100, "severity": "LOW", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-07 13:00:54"}
 {"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-07 13:00:54"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "212.102.46.24", "packet_count": 9399, "threshold": 100, "severity": "LOW", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-20 10:41:30"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "192.168.8.137", "packet_count": 3206, "threshold": 100, "severity": "LOW", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-20 10:41:30"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-20 10:41:30"}
+{"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-04-20 10:42:59"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "212.102.46.24", "packet_count": 9399, "threshold": 100, "severity": "LOW", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-20 10:53:05"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "192.168.8.137", "packet_count": 3206, "threshold": 100, "severity": "LOW", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-20 10:53:05"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-20 10:53:05"}
+{"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-04-20 10:54:30"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "212.102.46.24", "packet_count": 9399, "threshold": 500, "severity": "HIGH", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-20 10:58:33"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "192.168.8.137", "packet_count": 3206, "threshold": 500, "severity": "MEDIUM", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-20 10:58:33"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-20 10:58:33"}
+{"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-04-20 10:59:52"}

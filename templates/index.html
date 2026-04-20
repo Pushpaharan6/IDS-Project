@@ -10,7 +10,7 @@
     <div class="page">
         <header class="header">
             <h1>Intrusion Detection System Dashboard</h1>
-            <p>Upload a PCAP file and review alerts</p>
+            <p>Upload a PCAP file and review alerts, traffic patterns, and top source IP activity.</p>
         </header>
 
         <section class="card upload-card">
@@ -31,11 +31,30 @@
         </section>
 
         {% if result %}
+        <section class="card">
+    <h2>Report Export</h2>
+    <a href="{{ url_for('download_report') }}" class="download-btn">Download TXT Report</a>
+</section>
         <section class="stats-grid">
             <div class="card stat-card">
                 <h3>Total Packets</h3>
                 <p>{{ result.total_packets }}</p>
             </div>
+            <div class="card stat-card">
+                <h3>Unique Source IPs</h3>
+                <p>{{ result.unique_source_ips }}</p>
+            </div>
+            <div class="card stat-card">
+                <h3>Total Alerts</h3>
+                <p>{{ result.alert_summary.total }}</p>
+            </div>
+            <div class="card stat-card">
+                <h3>Highest Severity</h3>
+                <p>{{ result.alert_summary.highest_severity }}</p>
+            </div>
+        </section>
+
+        <section class="stats-grid">
             <div class="card stat-card">
                 <h3>Low Traffic IPs</h3>
                 <p>{{ result.traffic_categories.low_count }}</p>
@@ -48,6 +67,19 @@
                 <h3>High Traffic IPs</h3>
                 <p>{{ result.traffic_categories.high_count }}</p>
             </div>
+            <div class="card stat-card">
+                <h3>Traffic Thresholds</h3>
+                <p class="threshold-text">p50={{ result.traffic_categories.p50 }} | p90={{ result.traffic_categories.p90 }}</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Alert Summary</h2>
+            <div class="summary-row">
+                <div class="summary-pill">PORT_SCAN: {{ result.alert_summary.port_scan_count }}</div>
+                <div class="summary-pill">SYN_ACTIVITY: {{ result.alert_summary.syn_count }}</div>
+                <div class="summary-pill">HIGH_TRAFFIC: {{ result.alert_summary.high_traffic_count }}</div>
+            </div>
         </section>
 
         <section class="card">
@@ -55,15 +87,38 @@
             {% if result.alerts %}
                 <div class="alerts-list">
                     {% for alert in result.alerts %}
-                        <div class="alert-box">
-                            <strong>{{ alert.type }}</strong><br>
-                            Source: {{ alert.source }}<br>
-                            {{ alert.details }}
+                        <div class="alert-box alert-{{ alert.severity_class }}">
+                            <div class="alert-top">
+                                <strong>{{ alert.type }}</strong>
+                                <span class="severity-badge severity-{{ alert.severity_class }}">{{ alert.severity }}</span>
+                            </div>
+                            <div class="alert-meta">Source: {{ alert.source }}</div>
+                            <div class="alert-details">{{ alert.details }}</div>
                         </div>
                     {% endfor %}
                 </div>
             {% else %}
                 <p>No suspicious activity detected in this file.</p>
+            {% endif %}
+        </section>
+
+        <section class="card">
+            <h2>Top Source IP Activity</h2>
+
+            {% if result.top_talker_bars %}
+                <div class="bar-chart">
+                    {% for item in result.top_talker_bars %}
+                        <div class="bar-row">
+                            <div class="bar-label">{{ item.ip }}</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: {{ item.width_percent }}%;"></div>
+                            </div>
+                            <div class="bar-value">{{ item.count }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No source IP activity found.</p>
             {% endif %}
         </section>
 

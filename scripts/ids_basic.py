@@ -2,7 +2,7 @@
 ids_basic.py
 Offline + Live Intrusion Detection System (IDS)
 PCAP analysis + live packet sniffing with detection rules, logging,
-NumPy traffic categorization, and SIEM-friendly JSON logging
+traffic categorization, and dashboard support.
 
 Author: Pushpaharan
 """
@@ -21,9 +21,10 @@ import numpy as np
 # SETTINGS / CONSTANTS
 # -----------------------
 
-PORTSCAN_UNIQUE_PORTS_THRESHOLD = 1   # testing threshold
-SYN_COUNT_THRESHOLD = 5               # testing threshold
-HIGH_TRAFFIC_PACKET_THRESHOLD = 100   # high traffic anomaly threshold
+# Final-demo friendly thresholds
+PORTSCAN_UNIQUE_PORTS_THRESHOLD = 5
+SYN_COUNT_THRESHOLD = 10
+HIGH_TRAFFIC_PACKET_THRESHOLD = 500
 
 TOP_TALKERS_COUNT = 5
 TOP_CATEGORY_DISPLAY_COUNT = 3
@@ -95,6 +96,51 @@ def write_results_summary(lines, results_path: str = DEFAULT_RESULTS_PATH):
 
 
 # -----------------------
+# SEVERITY HELPERS
+# -----------------------
+
+SEVERITY_RANK = {
+    "LOW": 1,
+    "MEDIUM": 2,
+    "HIGH": 3
+}
+
+
+def severity_class(severity: str) -> str:
+    return severity.lower()
+
+
+def determine_portscan_severity(unique_ports: int) -> str:
+    if unique_ports >= 25:
+        return "HIGH"
+    if unique_ports >= 15:
+        return "MEDIUM"
+    return "LOW"
+
+
+def determine_syn_severity(syn_count: int) -> str:
+    if syn_count >= 80:
+        return "HIGH"
+    if syn_count >= 40:
+        return "MEDIUM"
+    return "LOW"
+
+
+def determine_high_traffic_severity(packet_count: int) -> str:
+    if packet_count >= 5000:
+        return "HIGH"
+    if packet_count >= 2000:
+        return "MEDIUM"
+    return "LOW"
+
+
+def highest_severity(alerts: list) -> str:
+    if not alerts:
+        return "NONE"
+    return max(alerts, key=lambda a: SEVERITY_RANK.get(a.get("severity", "LOW"), 0))["severity"]
+
+
+# -----------------------
 # INTERFACES
 # -----------------------
 
@@ -130,6 +176,50 @@ def resolve_interface(interface):
 # DETECTION RULES
 # -----------------------
 
+def build_port_scan_alert(src_ip: str, sorted_ports: list) -> dict:
+    unique_ports = len(sorted_ports)
+    severity = determine_portscan_severity(unique_ports)
+
+    return {
+        "record_type": "ALERT",
+        "alert_type": "PORT_SCAN",
+        "source_ip": src_ip,
+        "unique_ports": unique_ports,
+        "ports": sorted_ports,
+        "threshold": PORTSCAN_UNIQUE_PORTS_THRESHOLD,
+        "severity": severity,
+        "detection": "Possible_Port_Scan"
+    }
+
+
+def build_syn_alert(src_ip: str, syn_count: int) -> dict:
+    severity = determine_syn_severity(syn_count)
+
+    return {
+        "record_type": "ALERT",
+        "alert_type": "SYN_ACTIVITY",
+        "source_ip": src_ip,
+        "syn_count": syn_count,
+        "threshold": SYN_COUNT_THRESHOLD,
+        "severity": severity,
+        "detection": "Possible_SYN_Scan_or_Flood"
+    }
+
+
+def build_high_traffic_alert(src_ip: str, packet_count: int) -> dict:
+    severity = determine_high_traffic_severity(packet_count)
+
+    return {
+        "record_type": "ALERT",
+        "alert_type": "HIGH_TRAFFIC",
+        "source_ip": src_ip,
+        "packet_count": packet_count,
+        "threshold": HIGH_TRAFFIC_PACKET_THRESHOLD,
+        "severity": severity,
+        "detection": "Possible_Traffic_Anomaly"
+    }
+
+
 def detect_port_scan(src_to_ports: dict):
     """
     Rule A: Port scan detection
@@ -144,10 +234,10 @@ def detect_port_scan(src_to_ports: dict):
 
         if unique_ports >= PORTSCAN_UNIQUE_PORTS_THRESHOLD:
             sorted_ports = sorted(port_set)
-            severity = "HIGH"
+            alert_record = build_port_scan_alert(src_ip, sorted_ports)
 
             alert_msg = (
-                f"ALERT {severity} PORT_SCAN "
+                f"ALERT {alert_record['severity']} PORT_SCAN "
                 f"Source={src_ip} "
                 f"UniquePorts={unique_ports} "
                 f"Ports={sorted_ports} "
@@ -157,17 +247,6 @@ def detect_port_scan(src_to_ports: dict):
 
             print("[!]", alert_msg)
             log_alert(alert_msg)
-
-            alert_record = {
-                "record_type": "ALERT",
-                "alert_type": "PORT_SCAN",
-                "source_ip": src_ip,
-                "unique_ports": unique_ports,
-                "ports": sorted_ports,
-                "threshold": PORTSCAN_UNIQUE_PORTS_THRESHOLD,
-                "severity": severity,
-                "detection": "Possible_Port_Scan"
-            }
             log_alert_json(alert_record)
             alerts.append(alert_record)
 
@@ -188,10 +267,10 @@ def detect_syn_activity(src_syn_counts: dict):
 
     for src_ip, syn_count in src_syn_counts.items():
         if syn_count >= SYN_COUNT_THRESHOLD:
-            severity = "MEDIUM"
+            alert_record = build_syn_alert(src_ip, syn_count)
 
             alert_msg = (
-                f"ALERT {severity} SYN_ACTIVITY "
+                f"ALERT {alert_record['severity']} SYN_ACTIVITY "
                 f"Source={src_ip} "
                 f"SYNs={syn_count} "
                 f"Threshold={SYN_COUNT_THRESHOLD} "
@@ -200,16 +279,6 @@ def detect_syn_activity(src_syn_counts: dict):
 
             print("[!]", alert_msg)
             log_alert(alert_msg)
-
-            alert_record = {
-                "record_type": "ALERT",
-                "alert_type": "SYN_ACTIVITY",
-                "source_ip": src_ip,
-                "syn_count": syn_count,
-                "threshold": SYN_COUNT_THRESHOLD,
-                "severity": severity,
-                "detection": "Possible_SYN_Scan_or_Flood"
-            }
             log_alert_json(alert_record)
             alerts.append(alert_record)
 
@@ -230,10 +299,10 @@ def detect_high_traffic(src_counts: dict):
 
     for src_ip, packet_count in src_counts.items():
         if packet_count >= HIGH_TRAFFIC_PACKET_THRESHOLD:
-            severity = "LOW"
+            alert_record = build_high_traffic_alert(src_ip, packet_count)
 
             alert_msg = (
-                f"ALERT {severity} HIGH_TRAFFIC "
+                f"ALERT {alert_record['severity']} HIGH_TRAFFIC "
                 f"Source={src_ip} "
                 f"Packets={packet_count} "
                 f"Threshold={HIGH_TRAFFIC_PACKET_THRESHOLD} "
@@ -242,16 +311,6 @@ def detect_high_traffic(src_counts: dict):
 
             print("[!]", alert_msg)
             log_alert(alert_msg)
-
-            alert_record = {
-                "record_type": "ALERT",
-                "alert_type": "HIGH_TRAFFIC",
-                "source_ip": src_ip,
-                "packet_count": packet_count,
-                "threshold": HIGH_TRAFFIC_PACKET_THRESHOLD,
-                "severity": severity,
-                "detection": "Possible_Traffic_Anomaly"
-            }
             log_alert_json(alert_record)
             alerts.append(alert_record)
 
@@ -391,6 +450,29 @@ def summarize_run(mode_name: str, packet_count: int, src_counts: dict):
     )
 
 
+def format_dashboard_alert(alert_record: dict) -> dict:
+    """Convert backend alert record into dashboard-friendly structure."""
+    alert_type = alert_record["alert_type"]
+
+    if alert_type == "PORT_SCAN":
+        details = (
+            f"Unique destination ports: {alert_record['unique_ports']} | "
+            f"Ports: {alert_record['ports'][:12]}"
+        )
+    elif alert_type == "SYN_ACTIVITY":
+        details = f"SYN packets: {alert_record['syn_count']}"
+    else:
+        details = f"Packets: {alert_record['packet_count']}"
+
+    return {
+        "type": alert_type,
+        "severity": alert_record["severity"],
+        "severity_class": severity_class(alert_record["severity"]),
+        "source": alert_record["source_ip"],
+        "details": details
+    }
+
+
 # -----------------------
 # OFFLINE MODE
 # -----------------------
@@ -445,7 +527,8 @@ def run_offline_mode(pcap_file: str):
         f"Unique Source IPs: {len(src_counts)}",
         f"Top Talkers: {top_talkers}",
         f"Traffic Thresholds: p50={traffic_summary['p50']}, p90={traffic_summary['p90']}",
-        f"Alert Count: {len(all_alerts)}"
+        f"Alert Count: {len(all_alerts)}",
+        f"Highest Severity: {highest_severity(all_alerts)}"
     ]
     write_results_summary(results_lines)
 
@@ -549,7 +632,8 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
         f"Unique Source IPs: {len(src_counts)}",
         f"Top Talkers: {top_talkers}",
         f"Traffic Thresholds: p50={traffic_summary['p50']}, p90={traffic_summary['p90']}",
-        f"Alert Count: {len(all_alerts)}"
+        f"Alert Count: {len(all_alerts)}",
+        f"Highest Severity: {highest_severity(all_alerts)}"
     ]
     write_results_summary(results_lines)
 
@@ -585,41 +669,46 @@ def analyze_pcap_for_dashboard(pcap_file: str):
 
     low, medium, high, p50, p90 = categorize_traffic_numpy(src_counts)
 
-    alerts = []
+    raw_alerts = []
 
     for src_ip, port_set in src_to_ports.items():
-        unique_ports = len(port_set)
-        if unique_ports >= PORTSCAN_UNIQUE_PORTS_THRESHOLD:
-            sorted_ports = sorted(port_set)
-            alerts.append({
-                "type": "PORT_SCAN",
-                "severity": "HIGH",
-                "source": src_ip,
-                "details": f"UniquePorts={unique_ports}, Ports={sorted_ports}"
-            })
+        if len(port_set) >= PORTSCAN_UNIQUE_PORTS_THRESHOLD:
+            raw_alerts.append(build_port_scan_alert(src_ip, sorted(port_set)))
 
     for src_ip, syn_count in src_syn_counts.items():
         if syn_count >= SYN_COUNT_THRESHOLD:
-            alerts.append({
-                "type": "SYN_ACTIVITY",
-                "severity": "MEDIUM",
-                "source": src_ip,
-                "details": f"SYNs={syn_count}"
-            })
+            raw_alerts.append(build_syn_alert(src_ip, syn_count))
 
     for src_ip, packet_count in src_counts.items():
         if packet_count >= HIGH_TRAFFIC_PACKET_THRESHOLD:
-            alerts.append({
-                "type": "HIGH_TRAFFIC",
-                "severity": "LOW",
-                "source": src_ip,
-                "details": f"Packets={packet_count}"
-            })
+            raw_alerts.append(build_high_traffic_alert(src_ip, packet_count))
+
+    raw_alerts.sort(key=lambda a: SEVERITY_RANK.get(a["severity"], 0), reverse=True)
+    dashboard_alerts = [format_dashboard_alert(alert) for alert in raw_alerts]
+
+    alert_type_counts = {
+        "PORT_SCAN": sum(1 for a in raw_alerts if a["alert_type"] == "PORT_SCAN"),
+        "SYN_ACTIVITY": sum(1 for a in raw_alerts if a["alert_type"] == "SYN_ACTIVITY"),
+        "HIGH_TRAFFIC": sum(1 for a in raw_alerts if a["alert_type"] == "HIGH_TRAFFIC")
+    }
+
+    max_packets = max((count for _, count in top_talkers), default=1)
+
+    talker_bars = []
+    for ip, count in top_talkers:
+        width_percent = round((count / max_packets) * 100, 1) if max_packets else 0
+        talker_bars.append({
+            "ip": ip,
+            "count": count,
+            "width_percent": width_percent
+        })
 
     return {
         "pcap_file": pcap_file,
         "total_packets": len(packets),
+        "unique_source_ips": len(src_counts),
         "top_talkers": top_talkers,
+        "top_talker_bars": talker_bars,
         "traffic_categories": {
             "low_count": len(low),
             "medium_count": len(medium),
@@ -627,7 +716,14 @@ def analyze_pcap_for_dashboard(pcap_file: str):
             "p50": p50,
             "p90": p90
         },
-        "alerts": alerts
+        "alerts": dashboard_alerts,
+        "alert_summary": {
+            "total": len(dashboard_alerts),
+            "highest_severity": highest_severity(raw_alerts),
+            "port_scan_count": alert_type_counts["PORT_SCAN"],
+            "syn_count": alert_type_counts["SYN_ACTIVITY"],
+            "high_traffic_count": alert_type_counts["HIGH_TRAFFIC"]
+        }
     }
 
 

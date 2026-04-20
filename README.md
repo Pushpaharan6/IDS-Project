@@ -149,6 +149,68 @@ The current IDS uses three main rules:
    - If the count reaches the threshold, a `HIGH_TRAFFIC` alert is generated
    - Severity: **LOW**
 
+   ## Recent Progress Update
+
+ I improved the IDS dashboard and reporting features for the final project presentation.
+
+### Completed 
+- Improved the dashboard layout and alert presentation
+- Added alert severity levels (**LOW**, **MEDIUM**, **HIGH**)
+- Fixed false port-scan behavior by adjusting detection thresholds
+- Added **Top Source IP Activity** visualization bars
+- Added **Alert Summary** cards for quick review
+- Added a **Download TXT Report** feature
+- Verified that the dashboard correctly handles:
+  - suspicious traffic with alerts
+  - normal traffic with no alerts
+
+### Dashboard Improvements
+The Flask dashboard now provides:
+- PCAP upload and analysis
+- total packet count
+- unique source IP count
+- traffic category counts
+- highest severity level
+- alert summary by type
+- detected alerts with severity badges
+- top source IP activity visualization
+- recent alerts log
+- downloadable TXT report
+
+### Detection Improvements
+The IDS logic was updated to make alert results more realistic:
+- Removed incorrect port-scan alerts caused by very low thresholds
+- Improved threshold tuning for better demo reliability
+- Confirmed that normal traffic files can return **no suspicious activity detected**
+- Confirmed that larger traffic files correctly generate **HIGH_TRAFFIC** alerts
+
+### Reporting Feature
+A new TXT export feature was added to the dashboard.  
+This allows the user to download a summary report after analyzing a PCAP file.
+
+The TXT report includes:
+- PCAP file name
+- total packets
+- unique source IPs
+- total alerts
+- highest severity
+- alert summary
+- traffic categories
+- detected alerts
+- top source IPs
+
+### Current Project Status
+The project now has a stable final-demo workflow:
+1. Upload a PCAP file
+2. Analyze traffic
+3. Detect suspicious behavior
+4. Display results in the dashboard
+5. Export results as a TXT report
+
+### Known Limitation
+Live packet capture on Windows virtual adapters is still inconsistent.  
+For the final presentation, the most reliable workflow is offline PCAP analysis through the dashboard.
+
 ## Future Improvements
 
   - Machine learning anomaly detection  
