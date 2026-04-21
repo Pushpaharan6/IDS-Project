@@ -1,8 +1,8 @@
-IDS OFFLINE RESULTS - 2026-04-21 12:37:12
-PCAP File: captures/icmp_test.pcapng
-Total Packets: 464
-Unique Source IPs: 5
-Top Talkers: [('192.168.8.137', 185), ('194.113.66.133', 183), ('192.168.8.158', 23), ('34.107.243.93', 18), ('192.168.8.1', 4)]
-Traffic Thresholds: p50=23, p90=184
+IDS OFFLINE RESULTS - 2026-04-21 14:47:33
+PCAP File: captures/icmp_real_test.pcapng
+Total Packets: 197
+Unique Source IPs: 4
+Top Talkers: [('192.168.8.137', 94), ('194.113.66.133', 94), ('34.107.243.93', 2), ('192.168.8.158', 2)]
+Traffic Thresholds: p50=48, p90=94
 Alert Count: 0
 Highest Severity: NONE

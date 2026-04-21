@@ -275,3 +275,19 @@
 2026-04-21 12:32:51 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=464 unique_source_ips=5
 2026-04-21 12:37:12 INFO OFFLINE_RUN packet_count=464 unique_source_ips=5
 2026-04-21 12:37:12 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=464 unique_source_ips=5
+2026-04-21 12:58:53 INFO OFFLINE_RUN packet_count=197 unique_source_ips=4
+2026-04-21 12:58:53 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=197 unique_source_ips=4
+2026-04-21 13:01:16 INFO OFFLINE_RUN packet_count=197 unique_source_ips=4
+2026-04-21 13:01:16 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=197 unique_source_ips=4
+2026-04-21 13:05:55 INFO OFFLINE_RUN packet_count=197 unique_source_ips=4
+2026-04-21 13:05:55 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=197 unique_source_ips=4
+2026-04-21 13:57:45 INFO OFFLINE_RUN packet_count=197 unique_source_ips=4
+2026-04-21 13:57:45 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_real_test.pcapng packet_count=197 unique_source_ips=4
+2026-04-21 14:04:41 INFO OFFLINE_RUN packet_count=197 unique_source_ips=4
+2026-04-21 14:04:41 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_real_test.pcapng packet_count=197 unique_source_ips=4
+2026-04-21 14:05:27 INFO OFFLINE_RUN packet_count=197 unique_source_ips=4
+2026-04-21 14:05:27 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_real_test.pcapng packet_count=197 unique_source_ips=4
+2026-04-21 14:44:14 INFO OFFLINE_RUN packet_count=197 unique_source_ips=4
+2026-04-21 14:44:14 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_real_test.pcapng packet_count=197 unique_source_ips=4
+2026-04-21 14:47:33 INFO OFFLINE_RUN packet_count=197 unique_source_ips=4
+2026-04-21 14:47:33 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_real_test.pcapng packet_count=197 unique_source_ips=4

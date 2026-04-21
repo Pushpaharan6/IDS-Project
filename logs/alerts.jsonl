@@ -83,3 +83,19 @@
 {"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:32:51"}
 {"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:37:12"}
 {"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:37:12"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 12:58:53"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 12:58:53"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 13:01:16"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 13:01:16"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 13:05:55"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 13:05:55"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 13:57:45"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_real_test.pcapng", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 13:57:45"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 14:04:41"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_real_test.pcapng", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 14:04:41"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 14:05:27"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_real_test.pcapng", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 14:05:27"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 14:44:14"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_real_test.pcapng", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 14:44:14"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 14:47:33"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_real_test.pcapng", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-21 14:47:33"}
