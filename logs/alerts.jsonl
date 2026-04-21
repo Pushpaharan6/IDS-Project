@@ -77,3 +77,5 @@
 {"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:21:46"}
 {"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:24:16"}
 {"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:24:16"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:29:20"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:29:20"}
