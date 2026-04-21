@@ -13,7 +13,7 @@ import json
 from datetime import datetime
 from collections import defaultdict
 
-from scapy.all import rdpcap, sniff, wrpcap, IP, TCP, IFACES
+from scapy.all import rdpcap, sniff, wrpcap, IP, TCP, ICMP, IFACES
 import numpy as np
 
 
@@ -25,6 +25,7 @@ import numpy as np
 PORTSCAN_UNIQUE_PORTS_THRESHOLD = 5
 SYN_COUNT_THRESHOLD = 10
 HIGH_TRAFFIC_PACKET_THRESHOLD = 500
+ICMP_FLOOD_THRESHOLD = 5
 
 TOP_TALKERS_COUNT = 5
 TOP_CATEGORY_DISPLAY_COUNT = 3
@@ -134,6 +135,14 @@ def determine_high_traffic_severity(packet_count: int) -> str:
     return "LOW"
 
 
+def determine_icmp_severity(icmp_count: int) -> str:
+    if icmp_count >= 100:
+        return "HIGH"
+    if icmp_count >= 50:
+        return "MEDIUM"
+    return "LOW"
+
+
 def highest_severity(alerts: list) -> str:
     if not alerts:
         return "NONE"
@@ -217,6 +226,20 @@ def build_high_traffic_alert(src_ip: str, packet_count: int) -> dict:
         "threshold": HIGH_TRAFFIC_PACKET_THRESHOLD,
         "severity": severity,
         "detection": "Possible_Traffic_Anomaly"
+    }
+
+
+def build_icmp_alert(src_ip: str, icmp_count: int) -> dict:
+    severity = determine_icmp_severity(icmp_count)
+
+    return {
+        "record_type": "ALERT",
+        "alert_type": "ICMP_FLOOD",
+        "source_ip": src_ip,
+        "icmp_count": icmp_count,
+        "threshold": ICMP_FLOOD_THRESHOLD,
+        "severity": severity,
+        "detection": "Possible_ICMP_Flood"
     }
 
 
@@ -320,6 +343,38 @@ def detect_high_traffic(src_counts: dict):
     return alerts
 
 
+def detect_icmp_flood(src_icmp_counts: dict):
+    """
+    Rule D: ICMP flood detection
+    Detects unusually high ICMP packet counts per source IP.
+    Returns a list of alert dictionaries.
+    """
+    print("\n[+] ICMP Flood Check (ICMP packets per source):")
+    alerts = []
+
+    for src_ip, icmp_count in src_icmp_counts.items():
+        if icmp_count >= ICMP_FLOOD_THRESHOLD:
+            alert_record = build_icmp_alert(src_ip, icmp_count)
+
+            alert_msg = (
+                f"ALERT {alert_record['severity']} ICMP_FLOOD "
+                f"Source={src_ip} "
+                f"ICMPs={icmp_count} "
+                f"Threshold={ICMP_FLOOD_THRESHOLD} "
+                f"Detection=Possible_ICMP_Flood"
+            )
+
+            print("[!]", alert_msg)
+            log_alert(alert_msg)
+            log_alert_json(alert_record)
+            alerts.append(alert_record)
+
+    if not alerts:
+        print("[+] No suspicious ICMP flood activity detected.")
+
+    return alerts
+
+
 # -----------------------
 # NUMPY TRAFFIC ANALYSIS
 # -----------------------
@@ -392,11 +447,12 @@ def analyze_packets(packets):
     """
     Analyze packets and build traffic statistics used by both offline and live modes.
     Returns:
-        src_counts, src_to_ports, src_syn_counts
+        src_counts, src_to_ports, src_syn_counts, src_icmp_counts
     """
     src_counts = defaultdict(int)
     src_to_ports = defaultdict(set)
     src_syn_counts = defaultdict(int)
+    src_icmp_counts = defaultdict(int)
 
     for pkt in packets:
         try:
@@ -414,10 +470,13 @@ def analyze_packets(packets):
 
                     if (flags & syn_flag) and not (flags & ack_flag):
                         src_syn_counts[src_ip] += 1
+
+                if pkt.haslayer(ICMP):
+                    src_icmp_counts[src_ip] += 1
         except Exception:
             continue
 
-    return src_counts, src_to_ports, src_syn_counts
+    return src_counts, src_to_ports, src_syn_counts, src_icmp_counts
 
 
 def print_top_talkers(src_counts: dict):
@@ -461,6 +520,8 @@ def format_dashboard_alert(alert_record: dict) -> dict:
         )
     elif alert_type == "SYN_ACTIVITY":
         details = f"SYN packets: {alert_record['syn_count']}"
+    elif alert_type == "ICMP_FLOOD":
+        details = f"ICMP packets: {alert_record['icmp_count']}"
     else:
         details = f"Packets: {alert_record['packet_count']}"
 
@@ -498,15 +559,16 @@ def run_offline_mode(pcap_file: str):
         log_info_event("OFFLINE_EMPTY_FILE", {"pcap_file": pcap_file})
         return
 
-    src_counts, src_to_ports, src_syn_counts = analyze_packets(packets)
-
+    src_counts, src_to_ports, src_syn_counts, src_icmp_counts = analyze_packets(packets)
+    print("[DEBUG] ICMP counts:", dict(src_icmp_counts))
     top_talkers = print_top_talkers(src_counts)
     traffic_summary = print_traffic_categories(src_counts)
 
     port_alerts = detect_port_scan(src_to_ports)
     syn_alerts = detect_syn_activity(src_syn_counts)
     high_traffic_alerts = detect_high_traffic(src_counts)
-    all_alerts = port_alerts + syn_alerts + high_traffic_alerts
+    icmp_alerts = detect_icmp_flood(src_icmp_counts)
+    all_alerts = port_alerts + syn_alerts + high_traffic_alerts + icmp_alerts
 
     summarize_run("OFFLINE", len(packets), src_counts)
 
@@ -599,11 +661,12 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
         )
         return
 
-    src_counts, src_to_ports, src_syn_counts = analyze_packets(packets)
+    src_counts, src_to_ports, src_syn_counts, src_icmp_counts = analyze_packets(packets)
 
     print(f"[+] Unique source IPs found: {len(src_counts)}")
     print(f"[+] TCP source entries found: {len(src_to_ports)}")
     print(f"[+] SYN source entries found: {len(src_syn_counts)}")
+    print(f"[+] ICMP source entries found: {len(src_icmp_counts)}")
 
     top_talkers = print_top_talkers(src_counts)
     traffic_summary = print_traffic_categories(src_counts)
@@ -611,7 +674,8 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
     port_alerts = detect_port_scan(src_to_ports)
     syn_alerts = detect_syn_activity(src_syn_counts)
     high_traffic_alerts = detect_high_traffic(src_counts)
-    all_alerts = port_alerts + syn_alerts + high_traffic_alerts
+    icmp_alerts = detect_icmp_flood(src_icmp_counts)
+    all_alerts = port_alerts + syn_alerts + high_traffic_alerts + icmp_alerts
 
     summarize_run("LIVE", len(packets), src_counts)
 
@@ -659,7 +723,7 @@ def analyze_pcap_for_dashboard(pcap_file: str):
     if len(packets) == 0:
         return {"error": "PCAP file contains 0 packets."}
 
-    src_counts, src_to_ports, src_syn_counts = analyze_packets(packets)
+    src_counts, src_to_ports, src_syn_counts, src_icmp_counts = analyze_packets(packets)
 
     top_talkers = sorted(
         src_counts.items(),
@@ -679,6 +743,10 @@ def analyze_pcap_for_dashboard(pcap_file: str):
         if syn_count >= SYN_COUNT_THRESHOLD:
             raw_alerts.append(build_syn_alert(src_ip, syn_count))
 
+    for src_ip, icmp_count in src_icmp_counts.items():
+        if icmp_count >= ICMP_FLOOD_THRESHOLD:
+            raw_alerts.append(build_icmp_alert(src_ip, icmp_count))
+
     for src_ip, packet_count in src_counts.items():
         if packet_count >= HIGH_TRAFFIC_PACKET_THRESHOLD:
             raw_alerts.append(build_high_traffic_alert(src_ip, packet_count))
@@ -689,7 +757,8 @@ def analyze_pcap_for_dashboard(pcap_file: str):
     alert_type_counts = {
         "PORT_SCAN": sum(1 for a in raw_alerts if a["alert_type"] == "PORT_SCAN"),
         "SYN_ACTIVITY": sum(1 for a in raw_alerts if a["alert_type"] == "SYN_ACTIVITY"),
-        "HIGH_TRAFFIC": sum(1 for a in raw_alerts if a["alert_type"] == "HIGH_TRAFFIC")
+        "HIGH_TRAFFIC": sum(1 for a in raw_alerts if a["alert_type"] == "HIGH_TRAFFIC"),
+        "ICMP_FLOOD": sum(1 for a in raw_alerts if a["alert_type"] == "ICMP_FLOOD")
     }
 
     max_packets = max((count for _, count in top_talkers), default=1)
@@ -722,7 +791,8 @@ def analyze_pcap_for_dashboard(pcap_file: str):
             "highest_severity": highest_severity(raw_alerts),
             "port_scan_count": alert_type_counts["PORT_SCAN"],
             "syn_count": alert_type_counts["SYN_ACTIVITY"],
-            "high_traffic_count": alert_type_counts["HIGH_TRAFFIC"]
+            "high_traffic_count": alert_type_counts["HIGH_TRAFFIC"],
+            "icmp_count": alert_type_counts["ICMP_FLOOD"]
         }
     }
 

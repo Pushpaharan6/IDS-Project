@@ -1,4 +1,6 @@
 import os
+import io
+import csv
 from flask import Flask, render_template, request, redirect, url_for, flash, session, Response
 from werkzeug.utils import secure_filename
 
@@ -48,6 +50,7 @@ def build_txt_report(result):
     lines.append(f"PORT_SCAN: {result['alert_summary'].get('port_scan_count', 0)}")
     lines.append(f"SYN_ACTIVITY: {result['alert_summary'].get('syn_count', 0)}")
     lines.append(f"HIGH_TRAFFIC: {result['alert_summary'].get('high_traffic_count', 0)}")
+    lines.append(f"ICMP_FLOOD: {result['alert_summary'].get('icmp_count', 0)}")
     lines.append("")
 
     lines.append("TRAFFIC CATEGORIES")
@@ -84,6 +87,51 @@ def build_txt_report(result):
     return "\n".join(lines)
 
 
+def build_csv_report(result):
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    writer.writerow(["PCAP File", result.get("pcap_file", "N/A")])
+    writer.writerow(["Total Packets", result.get("total_packets", 0)])
+    writer.writerow(["Unique Source IPs", result.get("unique_source_ips", 0)])
+    writer.writerow(["Total Alerts", result["alert_summary"].get("total", 0)])
+    writer.writerow(["Highest Severity", result["alert_summary"].get("highest_severity", "NONE")])
+    writer.writerow([])
+
+    writer.writerow(["Alert Summary"])
+    writer.writerow(["PORT_SCAN", result["alert_summary"].get("port_scan_count", 0)])
+    writer.writerow(["SYN_ACTIVITY", result["alert_summary"].get("syn_count", 0)])
+    writer.writerow(["HIGH_TRAFFIC", result["alert_summary"].get("high_traffic_count", 0)])
+    writer.writerow(["ICMP_FLOOD", result["alert_summary"].get("icmp_count", 0)])
+    writer.writerow([])
+
+    writer.writerow(["Detected Alerts"])
+    writer.writerow(["Type", "Severity", "Source IP", "Details"])
+
+    if result.get("alerts"):
+        for alert in result["alerts"]:
+            writer.writerow([
+                alert.get("type", "N/A"),
+                alert.get("severity", "N/A"),
+                alert.get("source", "N/A"),
+                alert.get("details", "N/A")
+            ])
+    else:
+        writer.writerow(["NO_ALERTS", "NONE", "N/A", "No suspicious activity detected"])
+
+    writer.writerow([])
+    writer.writerow(["Top Source IPs"])
+    writer.writerow(["Source IP", "Packets"])
+
+    if result.get("top_talkers"):
+        for ip, count in result["top_talkers"]:
+            writer.writerow([ip, count])
+    else:
+        writer.writerow(["N/A", 0])
+
+    return output.getvalue()
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
@@ -114,7 +162,6 @@ def index():
             result = None
         else:
             flash(f"Analysis completed for {filename}")
-
             session["last_result"] = result
             session["last_filename"] = filename
 
@@ -131,7 +178,6 @@ def download_report():
         return redirect(url_for("index"))
 
     report_text = build_txt_report(result)
-
     filename = session.get("last_filename", "ids_report")
     report_filename = f"{os.path.splitext(filename)[0]}_report.txt"
 
@@ -140,6 +186,27 @@ def download_report():
         mimetype="text/plain",
         headers={
             "Content-Disposition": f"attachment; filename={report_filename}"
+        }
+    )
+
+
+@app.route("/download-csv")
+def download_csv():
+    result = session.get("last_result")
+
+    if not result:
+        flash("No analysis result available yet. Please upload and analyze a PCAP first.")
+        return redirect(url_for("index"))
+
+    csv_text = build_csv_report(result)
+    filename = session.get("last_filename", "ids_report")
+    csv_filename = f"{os.path.splitext(filename)[0]}_report.csv"
+
+    return Response(
+        csv_text,
+        mimetype="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename={csv_filename}"
         }
     )
 

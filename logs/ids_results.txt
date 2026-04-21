@@ -1,8 +1,8 @@
-IDS OFFLINE RESULTS - 2026-04-20 10:58:33
-PCAP File: uploads/kali_portscan.pcapng
-Total Packets: 12619
-Unique Source IPs: 3
-Top Talkers: [('212.102.46.24', 9399), ('192.168.8.137', 3206), ('192.168.8.160', 4)]
-Traffic Thresholds: p50=3206, p90=8160
-Alert Count: 2
-Highest Severity: HIGH
+IDS OFFLINE RESULTS - 2026-04-21 12:24:16
+PCAP File: captures/icmp_test.pcapng
+Total Packets: 464
+Unique Source IPs: 5
+Top Talkers: [('192.168.8.137', 185), ('194.113.66.133', 183), ('192.168.8.158', 23), ('34.107.243.93', 18), ('192.168.8.1', 4)]
+Traffic Thresholds: p50=23, p90=184
+Alert Count: 0
+Highest Severity: NONE

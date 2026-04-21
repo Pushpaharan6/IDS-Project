@@ -32,9 +32,13 @@
 
         {% if result %}
         <section class="card">
-    <h2>Report Export</h2>
-    <a href="{{ url_for('download_report') }}" class="download-btn">Download TXT Report</a>
-</section>
+            <h2>Report Export</h2>
+            <div class="download-actions">
+                <a href="{{ url_for('download_report') }}" class="download-btn">Download TXT Report</a>
+                <a href="{{ url_for('download_csv') }}" class="download-btn secondary-btn">Download CSV Report</a>
+            </div>
+        </section>
+
         <section class="stats-grid">
             <div class="card stat-card">
                 <h3>Total Packets</h3>
@@ -79,7 +83,12 @@
                 <div class="summary-pill">PORT_SCAN: {{ result.alert_summary.port_scan_count }}</div>
                 <div class="summary-pill">SYN_ACTIVITY: {{ result.alert_summary.syn_count }}</div>
                 <div class="summary-pill">HIGH_TRAFFIC: {{ result.alert_summary.high_traffic_count }}</div>
+                <div class="summary-pill">ICMP_FLOOD: {{ result.alert_summary.icmp_count }}</div>
             </div>
+
+            {% if result.alert_summary.total == 0 %}
+                <p class="no-alert-note">No alerts were triggered for this file.</p>
+            {% endif %}
         </section>
 
         <section class="card">

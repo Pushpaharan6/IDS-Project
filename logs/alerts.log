@@ -246,3 +246,26 @@
 2026-04-20 10:58:33 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
 2026-04-20 10:58:33 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
 2026-04-20 10:59:52 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
+2026-04-21 10:24:18 INFO LIVE_NO_PACKETS interface=\Device\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9} packet_limit=500 timeout=60
+2026-04-21 11:48:42 ALERT HIGH HIGH_TRAFFIC Source=194.113.66.133 Packets=18825 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-21 11:48:42 ALERT HIGH HIGH_TRAFFIC Source=192.168.8.137 Packets=10140 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-21 11:48:42 INFO OFFLINE_RUN packet_count=29043 unique_source_ips=5
+2026-04-21 11:49:12 ALERT HIGH HIGH_TRAFFIC Source=194.113.66.133 Packets=18825 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-21 11:49:12 ALERT HIGH HIGH_TRAFFIC Source=192.168.8.137 Packets=10140 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-21 11:49:12 INFO OFFLINE_RUN packet_count=29043 unique_source_ips=5
+2026-04-21 11:55:41 INFO OFFLINE_RUN packet_count=418 unique_source_ips=3
+2026-04-21 11:55:41 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=418 unique_source_ips=3
+2026-04-21 11:55:58 INFO OFFLINE_RUN packet_count=418 unique_source_ips=3
+2026-04-21 11:55:58 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=418 unique_source_ips=3
+2026-04-21 12:05:13 ALERT LOW HIGH_TRAFFIC Source=194.113.66.133 Packets=510 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-21 12:05:13 INFO OFFLINE_RUN packet_count=1010 unique_source_ips=5
+2026-04-21 12:10:36 INFO OFFLINE_RUN packet_count=165 unique_source_ips=2
+2026-04-21 12:10:36 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=165 unique_source_ips=2
+2026-04-21 12:13:38 INFO OFFLINE_RUN packet_count=165 unique_source_ips=2
+2026-04-21 12:13:38 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=165 unique_source_ips=2
+2026-04-21 12:19:52 INFO OFFLINE_RUN packet_count=464 unique_source_ips=5
+2026-04-21 12:19:52 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=464 unique_source_ips=5
+2026-04-21 12:21:46 INFO OFFLINE_RUN packet_count=464 unique_source_ips=5
+2026-04-21 12:21:46 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=464 unique_source_ips=5
+2026-04-21 12:24:16 INFO OFFLINE_RUN packet_count=464 unique_source_ips=5
+2026-04-21 12:24:16 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_test.pcapng packet_count=464 unique_source_ips=5

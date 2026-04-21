@@ -54,3 +54,26 @@
 {"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "192.168.8.137", "packet_count": 3206, "threshold": 500, "severity": "MEDIUM", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-20 10:58:33"}
 {"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-20 10:58:33"}
 {"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-04-20 10:59:52"}
+{"record_type": "INFO", "event_type": "LIVE_NO_PACKETS", "interface": "\\Device\\NPF_{10AF01FD-DFD2-45B8-9317-98001803F5E9}", "packet_limit": 500, "timeout": 60, "timestamp": "2026-04-21 10:24:18"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "194.113.66.133", "packet_count": 18825, "threshold": 500, "severity": "HIGH", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-21 11:48:42"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "192.168.8.137", "packet_count": 10140, "threshold": 500, "severity": "HIGH", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-21 11:48:42"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 29043, "unique_source_ips": 5, "timestamp": "2026-04-21 11:48:42"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "194.113.66.133", "packet_count": 18825, "threshold": 500, "severity": "HIGH", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-21 11:49:12"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "192.168.8.137", "packet_count": 10140, "threshold": 500, "severity": "HIGH", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-21 11:49:12"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 29043, "unique_source_ips": 5, "timestamp": "2026-04-21 11:49:12"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 418, "unique_source_ips": 3, "timestamp": "2026-04-21 11:55:41"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 418, "unique_source_ips": 3, "timestamp": "2026-04-21 11:55:41"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 418, "unique_source_ips": 3, "timestamp": "2026-04-21 11:55:58"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 418, "unique_source_ips": 3, "timestamp": "2026-04-21 11:55:58"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "194.113.66.133", "packet_count": 510, "threshold": 500, "severity": "LOW", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-21 12:05:13"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 1010, "unique_source_ips": 5, "timestamp": "2026-04-21 12:05:13"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 165, "unique_source_ips": 2, "timestamp": "2026-04-21 12:10:36"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 165, "unique_source_ips": 2, "timestamp": "2026-04-21 12:10:36"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 165, "unique_source_ips": 2, "timestamp": "2026-04-21 12:13:38"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 165, "unique_source_ips": 2, "timestamp": "2026-04-21 12:13:38"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:19:52"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:19:52"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:21:46"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:21:46"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:24:16"}
+{"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_test.pcapng", "packet_count": 464, "unique_source_ips": 5, "timestamp": "2026-04-21 12:24:16"}

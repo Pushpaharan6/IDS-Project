@@ -268,3 +268,37 @@ th {
 .download-btn:hover {
     background: #16d3ad;
 }
+.download-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.download-btn {
+    display: inline-block;
+    background: #20f0c7;
+    color: #081018;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.2s ease;
+}
+
+.download-btn:hover {
+    background: #16d3ad;
+}
+
+.secondary-btn {
+    background: #7cc8ff;
+    color: #081018;
+}
+
+.secondary-btn:hover {
+    background: #60b7f5;
+}
+.no-alert-note {
+    margin-top: 14px;
+    color: #9fb3c8;
+    font-style: italic;
+}
