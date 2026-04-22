@@ -291,3 +291,11 @@
 2026-04-21 14:44:14 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_real_test.pcapng packet_count=197 unique_source_ips=4
 2026-04-21 14:47:33 INFO OFFLINE_RUN packet_count=197 unique_source_ips=4
 2026-04-21 14:47:33 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_real_test.pcapng packet_count=197 unique_source_ips=4
+2026-04-21 20:33:01 INFO LIVE_RUN packet_count=200 unique_source_ips=3
+2026-04-21 20:33:01 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=3
+2026-04-22 20:42:50 INFO OFFLINE_RUN packet_count=197 unique_source_ips=4
+2026-04-22 20:42:50 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_real_test.pcapng packet_count=197 unique_source_ips=4
+2026-04-22 20:50:55 INFO OFFLINE_RUN packet_count=197 unique_source_ips=4
+2026-04-22 20:50:55 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_real_test.pcapng packet_count=197 unique_source_ips=4
+2026-04-22 20:53:17 INFO LIVE_RUN packet_count=200 unique_source_ips=17
+2026-04-22 20:53:17 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=17

@@ -1,10 +1,17 @@
 """
 ids_basic.py
 Offline + Live Intrusion Detection System (IDS)
-PCAP analysis + live packet sniffing with detection rules, logging,
-traffic categorization, and dashboard support.
 
-Author: Pushpaharan
+Features:
+- Offline PCAP / PCAPNG analysis
+- Live packet sniffing
+- Port scan detection
+- SYN activity detection
+- High traffic detection
+- ICMP flood detection
+- NumPy traffic categorization
+- Text + JSON logging
+- Flask dashboard support
 """
 
 import os
@@ -21,7 +28,6 @@ import numpy as np
 # SETTINGS / CONSTANTS
 # -----------------------
 
-# Final-demo friendly thresholds
 PORTSCAN_UNIQUE_PORTS_THRESHOLD = 5
 SYN_COUNT_THRESHOLD = 10
 HIGH_TRAFFIC_PACKET_THRESHOLD = 500
@@ -31,11 +37,11 @@ TOP_TALKERS_COUNT = 5
 TOP_CATEGORY_DISPLAY_COUNT = 3
 DEFAULT_PACKET_LIMIT = 200
 DEFAULT_TIMEOUT = 30
+
 DEFAULT_LOG_PATH = "logs/alerts.log"
 DEFAULT_JSON_LOG_PATH = "logs/alerts.jsonl"
 DEFAULT_RESULTS_PATH = "logs/ids_results.txt"
 
-# Set to None for easier Windows/VirtualBox live testing
 LIVE_SNIFF_FILTER = None
 
 
@@ -48,17 +54,15 @@ def current_timestamp() -> str:
 
 
 def log_alert(message: str, log_path: str = DEFAULT_LOG_PATH):
-    """Write message to text log with timestamp."""
     try:
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(f"{current_timestamp()} {message}\n")
     except Exception as e:
-        print(f"[!] ERROR writing to log file: {e}")
+        print(f"[!] ERROR writing alert log: {e}")
 
 
 def log_alert_json(record: dict, log_path: str = DEFAULT_JSON_LOG_PATH):
-    """Write structured alert/info data as one JSON object per line."""
     try:
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
         payload = record.copy()
@@ -67,17 +71,15 @@ def log_alert_json(record: dict, log_path: str = DEFAULT_JSON_LOG_PATH):
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(payload) + "\n")
     except Exception as e:
-        print(f"[!] ERROR writing JSON alert log: {e}")
+        print(f"[!] ERROR writing JSON log: {e}")
 
 
 def log_info_event(event_type: str, details: dict):
-    """Write non-alert informational events so logs are not empty."""
     text_parts = [f"INFO {event_type}"]
     for key, value in details.items():
         text_parts.append(f"{key}={value}")
-    text_message = " ".join(text_parts)
 
-    log_alert(text_message)
+    log_alert(" ".join(text_parts))
     log_alert_json({
         "record_type": "INFO",
         "event_type": event_type,
@@ -86,7 +88,6 @@ def log_info_event(event_type: str, details: dict):
 
 
 def write_results_summary(lines, results_path: str = DEFAULT_RESULTS_PATH):
-    """Write a plain text summary report for the latest run."""
     try:
         os.makedirs(os.path.dirname(results_path), exist_ok=True)
         with open(results_path, "w", encoding="utf-8") as f:
@@ -146,7 +147,10 @@ def determine_icmp_severity(icmp_count: int) -> str:
 def highest_severity(alerts: list) -> str:
     if not alerts:
         return "NONE"
-    return max(alerts, key=lambda a: SEVERITY_RANK.get(a.get("severity", "LOW"), 0))["severity"]
+    return max(
+        alerts,
+        key=lambda a: SEVERITY_RANK.get(a.get("severity", "LOW"), 0)
+    )["severity"]
 
 
 # -----------------------
@@ -154,7 +158,6 @@ def highest_severity(alerts: list) -> str:
 # -----------------------
 
 def list_interfaces():
-    """Show interfaces that Scapy can capture from."""
     print("\n[+] Available capture interfaces:")
     for iface in IFACES.values():
         try:
@@ -168,7 +171,6 @@ def list_interfaces():
 
 
 def resolve_interface(interface):
-    """Convert an interface index to a Scapy interface object if needed."""
     if interface is None:
         return None
 
@@ -182,7 +184,7 @@ def resolve_interface(interface):
 
 
 # -----------------------
-# DETECTION RULES
+# ALERT BUILDERS
 # -----------------------
 
 def build_port_scan_alert(src_ip: str, sorted_ports: list) -> dict:
@@ -243,12 +245,11 @@ def build_icmp_alert(src_ip: str, icmp_count: int) -> dict:
     }
 
 
+# -----------------------
+# DETECTION RULES
+# -----------------------
+
 def detect_port_scan(src_to_ports: dict):
-    """
-    Rule A: Port scan detection
-    Detects source IPs contacting many unique destination ports.
-    Returns a list of alert dictionaries.
-    """
     print("\n[+] Port Scan Check (unique destination ports per source):")
     alerts = []
 
@@ -280,11 +281,6 @@ def detect_port_scan(src_to_ports: dict):
 
 
 def detect_syn_activity(src_syn_counts: dict):
-    """
-    Rule B: SYN activity detection
-    Detects unusually high TCP SYN packet counts per source IP.
-    Returns a list of alert dictionaries.
-    """
     print("\n[+] SYN Activity Check (SYN packets per source):")
     alerts = []
 
@@ -312,11 +308,6 @@ def detect_syn_activity(src_syn_counts: dict):
 
 
 def detect_high_traffic(src_counts: dict):
-    """
-    Rule C: High traffic anomaly detection
-    Detects unusually high packet counts from a single source IP.
-    Returns a list of alert dictionaries.
-    """
     print("\n[+] High Traffic Check (packet count per source):")
     alerts = []
 
@@ -344,11 +335,6 @@ def detect_high_traffic(src_counts: dict):
 
 
 def detect_icmp_flood(src_icmp_counts: dict):
-    """
-    Rule D: ICMP flood detection
-    Detects unusually high ICMP packet counts per source IP.
-    Returns a list of alert dictionaries.
-    """
     print("\n[+] ICMP Flood Check (ICMP packets per source):")
     alerts = []
 
@@ -380,15 +366,10 @@ def detect_icmp_flood(src_icmp_counts: dict):
 # -----------------------
 
 def categorize_traffic_numpy(src_counts: dict):
-    """
-    Categorize source IPs into Low / Medium / High traffic using NumPy percentiles.
-    Returns: (low_list, medium_list, high_list, p50, p90)
-    """
     if not src_counts:
         return [], [], [], 0, 0
 
     counts = np.array(list(src_counts.values()), dtype=int)
-
     p50 = int(np.percentile(counts, 50))
     p90 = int(np.percentile(counts, 90))
 
@@ -410,7 +391,6 @@ def categorize_traffic_numpy(src_counts: dict):
 
 
 def print_traffic_categories(src_counts: dict):
-    """Display NumPy-based traffic categories and return summary info."""
     low, medium, high, p50, p90 = categorize_traffic_numpy(src_counts)
 
     print("\n[+] Traffic Categories:")
@@ -440,12 +420,12 @@ def print_traffic_categories(src_counts: dict):
 
 
 # -----------------------
-# SHARED PACKET ANALYSIS
+# PACKET ANALYSIS
 # -----------------------
 
 def analyze_packets(packets):
     """
-    Analyze packets and build traffic statistics used by both offline and live modes.
+    Build shared traffic statistics for offline, live, and dashboard modes.
     Returns:
         src_counts, src_to_ports, src_syn_counts, src_icmp_counts
     """
@@ -456,23 +436,34 @@ def analyze_packets(packets):
 
     for pkt in packets:
         try:
-            if pkt.haslayer(IP):
-                src_ip = pkt[IP].src
-                src_counts[src_ip] += 1
+            if not pkt.haslayer(IP):
+                continue
 
-                if pkt.haslayer(TCP):
-                    dport = int(pkt[TCP].dport)
-                    src_to_ports[src_ip].add(dport)
+            ip_layer = pkt[IP]
+            src_ip = ip_layer.src
+            src_counts[src_ip] += 1
 
-                    flags = int(pkt[TCP].flags)
-                    syn_flag = 0x02
-                    ack_flag = 0x10
+            # TCP analysis
+            if pkt.haslayer(TCP):
+                tcp_layer = pkt[TCP]
+                dport = int(tcp_layer.dport)
+                src_to_ports[src_ip].add(dport)
 
-                    if (flags & syn_flag) and not (flags & ack_flag):
-                        src_syn_counts[src_ip] += 1
+                flags = int(tcp_layer.flags)
+                syn_flag = 0x02
+                ack_flag = 0x10
 
-                if pkt.haslayer(ICMP):
-                    src_icmp_counts[src_ip] += 1
+                if (flags & syn_flag) and not (flags & ack_flag):
+                    src_syn_counts[src_ip] += 1
+
+            # ICMP analysis - robust fallback
+            proto = int(getattr(ip_layer, "proto", -1))
+
+            if pkt.haslayer(ICMP):
+                src_icmp_counts[src_ip] += 1
+            elif proto == 1:
+                src_icmp_counts[src_ip] += 1
+
         except Exception:
             continue
 
@@ -480,7 +471,6 @@ def analyze_packets(packets):
 
 
 def print_top_talkers(src_counts: dict):
-    """Print top source IPs by packet count and return top talkers list."""
     print(f"\n[+] Top {TOP_TALKERS_COUNT} source IPs:")
 
     top_talkers = sorted(
@@ -499,7 +489,6 @@ def print_top_talkers(src_counts: dict):
 
 
 def summarize_run(mode_name: str, packet_count: int, src_counts: dict):
-    """Write a general run summary to logs."""
     log_info_event(
         event_type=f"{mode_name}_RUN",
         details={
@@ -510,7 +499,6 @@ def summarize_run(mode_name: str, packet_count: int, src_counts: dict):
 
 
 def format_dashboard_alert(alert_record: dict) -> dict:
-    """Convert backend alert record into dashboard-friendly structure."""
     alert_type = alert_record["alert_type"]
 
     if alert_type == "PORT_SCAN":
@@ -539,7 +527,6 @@ def format_dashboard_alert(alert_record: dict) -> dict:
 # -----------------------
 
 def run_offline_mode(pcap_file: str):
-    """Analyze packets from a saved PCAP/PCAPNG file."""
     if not os.path.exists(pcap_file):
         print(f"[!] ERROR: File not found: {pcap_file}")
         return
@@ -561,6 +548,7 @@ def run_offline_mode(pcap_file: str):
 
     src_counts, src_to_ports, src_syn_counts, src_icmp_counts = analyze_packets(packets)
     print("[DEBUG] ICMP counts:", dict(src_icmp_counts))
+
     top_talkers = print_top_talkers(src_counts)
     traffic_summary = print_traffic_categories(src_counts)
 
@@ -568,6 +556,7 @@ def run_offline_mode(pcap_file: str):
     syn_alerts = detect_syn_activity(src_syn_counts)
     high_traffic_alerts = detect_high_traffic(src_counts)
     icmp_alerts = detect_icmp_flood(src_icmp_counts)
+
     all_alerts = port_alerts + syn_alerts + high_traffic_alerts + icmp_alerts
 
     summarize_run("OFFLINE", len(packets), src_counts)
@@ -604,7 +593,6 @@ def run_offline_mode(pcap_file: str):
 # -----------------------
 
 def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEFAULT_TIMEOUT):
-    """Capture and analyze live network traffic."""
     try:
         resolved_interface = resolve_interface(interface)
     except Exception as e:
@@ -617,8 +605,6 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
     print(f"    Packet limit: {packet_limit}")
     print(f"    Timeout: {timeout} seconds")
     print(f"    Filter: {LIVE_SNIFF_FILTER}")
-
-    packets = []
 
     try:
         if LIVE_SNIFF_FILTER:
@@ -662,6 +648,7 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
         return
 
     src_counts, src_to_ports, src_syn_counts, src_icmp_counts = analyze_packets(packets)
+    print("[DEBUG] ICMP counts:", dict(src_icmp_counts))
 
     print(f"[+] Unique source IPs found: {len(src_counts)}")
     print(f"[+] TCP source entries found: {len(src_to_ports)}")
@@ -675,6 +662,7 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
     syn_alerts = detect_syn_activity(src_syn_counts)
     high_traffic_alerts = detect_high_traffic(src_counts)
     icmp_alerts = detect_icmp_flood(src_icmp_counts)
+
     all_alerts = port_alerts + syn_alerts + high_traffic_alerts + icmp_alerts
 
     summarize_run("LIVE", len(packets), src_counts)
@@ -711,7 +699,6 @@ def run_live_mode(interface=None, packet_limit=DEFAULT_PACKET_LIMIT, timeout=DEF
 # -----------------------
 
 def analyze_pcap_for_dashboard(pcap_file: str):
-    """Return IDS results as a dictionary for Flask dashboard."""
     if not os.path.exists(pcap_file):
         return {"error": f"File not found: {pcap_file}"}
 
@@ -743,13 +730,13 @@ def analyze_pcap_for_dashboard(pcap_file: str):
         if syn_count >= SYN_COUNT_THRESHOLD:
             raw_alerts.append(build_syn_alert(src_ip, syn_count))
 
-    for src_ip, icmp_count in src_icmp_counts.items():
-        if icmp_count >= ICMP_FLOOD_THRESHOLD:
-            raw_alerts.append(build_icmp_alert(src_ip, icmp_count))
-
     for src_ip, packet_count in src_counts.items():
         if packet_count >= HIGH_TRAFFIC_PACKET_THRESHOLD:
             raw_alerts.append(build_high_traffic_alert(src_ip, packet_count))
+
+    for src_ip, icmp_count in src_icmp_counts.items():
+        if icmp_count >= ICMP_FLOOD_THRESHOLD:
+            raw_alerts.append(build_icmp_alert(src_ip, icmp_count))
 
     raw_alerts.sort(key=lambda a: SEVERITY_RANK.get(a["severity"], 0), reverse=True)
     dashboard_alerts = [format_dashboard_alert(alert) for alert in raw_alerts]
@@ -798,7 +785,7 @@ def analyze_pcap_for_dashboard(pcap_file: str):
 
 
 # -----------------------
-# MAIN PROGRAM
+# MAIN
 # -----------------------
 
 def main():
