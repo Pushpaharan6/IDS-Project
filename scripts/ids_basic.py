@@ -1,6 +1,15 @@
 """
 ids_basic.py
 Offline + Live Intrusion Detection System (IDS)
+PCAP analysis + live packet sniffing with detection rules, logging,
+traffic categorization, and dashboard support.
+
+Author: Pushpaharan
+"""
+
+"""
+ids_basic.py
+Offline + Live Intrusion Detection System (IDS)
 
 Features:
 - Offline PCAP / PCAPNG analysis
