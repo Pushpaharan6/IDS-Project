@@ -15,7 +15,7 @@ The IDS supports:
 - **Offline PCAP analysis**
 - **Live packet capture**
 - **Flask dashboard visualization**
-- **TXT report export**
+- **TXT and CSV report export**
 
 This project demonstrates key cybersecurity concepts such as packet inspection, network monitoring, anomaly detection, alert logging, and dashboard-based reporting.
 
@@ -48,6 +48,7 @@ The main goals of this project are to:
 - Flask dashboard for PCAP upload and result review
 - Top source IP activity visualization
 - Downloadable TXT report export
+- Downloadable CSV report export
 
 ---
 
@@ -91,6 +92,7 @@ Severity is shown in:
 The Flask dashboard provides a simple interface for reviewing IDS results.
 
 ### Dashboard Capabilities
+
 - Upload `.pcap` or `.pcapng` files
 - View total packet count
 - View unique source IP count
@@ -102,8 +104,79 @@ The Flask dashboard provides a simple interface for reviewing IDS results.
 - Review top source IP table
 - Review recent alert log entries
 - Download a TXT report after analysis
+- Download a CSV report after analysis
 
 ---
+## Output Files
+The IDS generates several output files:
+
+- logs/alerts.log → text-based alert log
+- logs/alerts.jsonl → JSON alert log
+- logs/ids_results.txt → latest results summary
+- downloadable TXT report from dashboard
+- downloadable CSV report from dashboard
+
+## Latest Updates
+Recent improvements to the project include:
+
+- improved Flask dashboard layout and styling
+- added alert summary display by rule type
+- added severity badges for alert visualization
+- added downloadable TXT report export
+- added downloadable CSV report export
+- improved README documentation and run instructions
+- improved logging structure with text and JSON output
+- added better support for dashboard-based review of suspicious traffic
+
+## Known Limitations
+- Live capture reliability on Windows may vary depending on the selected interface and adapter configuration.
+- Offline PCAP analysis is currently the most reliable workflow for demonstrating the IDS.
+- ICMP detection logic was explored, but still requires additional refinement depending on capture format and interface behavior.
+
+## Future Improvements
+Possible future improvements include:
+
+- machine learning anomaly detection
+- real-time network visualization
+- SIEM integration
+- improved live capture reliability on Windows virtual adapters
+- additional dashboard charts and analytics
+- downloadable CSV and advanced report formats
+- more detection rules
+- more advanced alert prioritization
+
+  ## Demonstration Summary
+  The project was successfully demonstrated using:
+
+- normal traffic analysis with no alerts
+- suspicious traffic analysis with alert generation
+- dashboard visualization of alert results
+- TXT and CSV report export
+- logging to text and JSON formats
+
+## Conclusion
+This project demonstrates a rule-based Python IDS that can analyze PCAP traffic, detect suspicious behavior, log alerts, and present results in a user-friendly dashboard.
+It provides a strong foundation for future improvements such as expanded detection rules, stronger live capture support, SIEM-ready logging, and intelligent anomaly detection.
+  
+## Project Structure
+
+```text
+IDS-Project/
+│
+├── app.py                     # Flask dashboard application
+├── README.md                  # Project documentation
+│
+├── captures/                  # Sample PCAP / PCAPNG files
+├── docs/                      # Project documents and report files
+├── logs/                      # alerts.log, alerts.jsonl, ids_results.txt
+├── proposal/                  # Proposal and presentation files
+├── static/                    # CSS for dashboard
+├── templates/                 # HTML templates for dashboard
+├── uploads/                   # Uploaded PCAP files from dashboard
+│
+└── scripts/
+    ├── ids_basic.py           # Main IDS engine
+    └── packet_capture.py      # Packet capture helper
 
 ## Project Structure
 
