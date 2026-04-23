@@ -299,3 +299,16 @@
 2026-04-22 20:50:55 INFO OFFLINE_NO_ALERTS pcap_file=captures/icmp_real_test.pcapng packet_count=197 unique_source_ips=4
 2026-04-22 20:53:17 INFO LIVE_RUN packet_count=200 unique_source_ips=17
 2026-04-22 20:53:17 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=17
+2026-04-22 22:36:29 INFO LIVE_RUN packet_count=200 unique_source_ips=21
+2026-04-22 22:36:30 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=21
+2026-04-22 22:37:11 INFO LIVE_RUN packet_count=200 unique_source_ips=18
+2026-04-22 22:37:11 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=18
+2026-04-22 22:41:42 INFO LIVE_RUN packet_count=200 unique_source_ips=17
+2026-04-22 22:41:42 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=17
+2026-04-22 22:44:22 INFO LIVE_RUN packet_count=196 unique_source_ips=16
+2026-04-22 22:44:22 INFO LIVE_NO_ALERTS interface=None packet_count=196 unique_source_ips=16
+2026-04-23 09:50:27 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-23 09:50:27 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-23 09:50:27 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-23 09:51:23 INFO LIVE_RUN packet_count=200 unique_source_ips=2
+2026-04-23 09:51:23 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=2

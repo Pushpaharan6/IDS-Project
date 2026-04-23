@@ -107,3 +107,16 @@
 {"record_type": "INFO", "event_type": "OFFLINE_NO_ALERTS", "pcap_file": "captures/icmp_real_test.pcapng", "packet_count": 197, "unique_source_ips": 4, "timestamp": "2026-04-22 20:50:55"}
 {"record_type": "INFO", "event_type": "LIVE_RUN", "packet_count": 200, "unique_source_ips": 17, "timestamp": "2026-04-22 20:53:17"}
 {"record_type": "INFO", "event_type": "LIVE_NO_ALERTS", "interface": "None", "packet_count": 200, "unique_source_ips": 17, "timestamp": "2026-04-22 20:53:17"}
+{"record_type": "INFO", "event_type": "LIVE_RUN", "packet_count": 200, "unique_source_ips": 21, "timestamp": "2026-04-22 22:36:29"}
+{"record_type": "INFO", "event_type": "LIVE_NO_ALERTS", "interface": "None", "packet_count": 200, "unique_source_ips": 21, "timestamp": "2026-04-22 22:36:30"}
+{"record_type": "INFO", "event_type": "LIVE_RUN", "packet_count": 200, "unique_source_ips": 18, "timestamp": "2026-04-22 22:37:11"}
+{"record_type": "INFO", "event_type": "LIVE_NO_ALERTS", "interface": "None", "packet_count": 200, "unique_source_ips": 18, "timestamp": "2026-04-22 22:37:11"}
+{"record_type": "INFO", "event_type": "LIVE_RUN", "packet_count": 200, "unique_source_ips": 17, "timestamp": "2026-04-22 22:41:42"}
+{"record_type": "INFO", "event_type": "LIVE_NO_ALERTS", "interface": "None", "packet_count": 200, "unique_source_ips": 17, "timestamp": "2026-04-22 22:41:42"}
+{"record_type": "INFO", "event_type": "LIVE_RUN", "packet_count": 196, "unique_source_ips": 16, "timestamp": "2026-04-22 22:44:22"}
+{"record_type": "INFO", "event_type": "LIVE_NO_ALERTS", "interface": "None", "packet_count": 196, "unique_source_ips": 16, "timestamp": "2026-04-22 22:44:22"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "212.102.46.24", "packet_count": 9399, "threshold": 500, "severity": "HIGH", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-23 09:50:27"}
+{"record_type": "ALERT", "alert_type": "HIGH_TRAFFIC", "source_ip": "192.168.8.137", "packet_count": 3206, "threshold": 500, "severity": "MEDIUM", "detection": "Possible_Traffic_Anomaly", "timestamp": "2026-04-23 09:50:27"}
+{"record_type": "INFO", "event_type": "OFFLINE_RUN", "packet_count": 12619, "unique_source_ips": 3, "timestamp": "2026-04-23 09:50:27"}
+{"record_type": "INFO", "event_type": "LIVE_RUN", "packet_count": 200, "unique_source_ips": 2, "timestamp": "2026-04-23 09:51:23"}
+{"record_type": "INFO", "event_type": "LIVE_NO_ALERTS", "interface": "None", "packet_count": 200, "unique_source_ips": 2, "timestamp": "2026-04-23 09:51:23"}
