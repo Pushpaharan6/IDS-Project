@@ -345,3 +345,67 @@
 2026-04-24 00:42:22 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
 2026-04-24 00:43:52 INFO LIVE_RUN packet_count=200 unique_source_ips=2
 2026-04-24 00:43:52 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=2
+2026-04-24 10:53:32 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 10:53:32 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 10:53:32 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 10:55:18 INFO LIVE_RUN packet_count=200 unique_source_ips=3
+2026-04-24 10:55:18 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=3
+2026-04-24 11:49:49 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 11:49:49 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 11:49:49 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 11:51:24 INFO LIVE_RUN packet_count=200 unique_source_ips=2
+2026-04-24 11:51:24 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=2
+2026-04-24 12:24:18 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 12:24:18 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 12:24:18 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 12:25:59 INFO LIVE_RUN packet_count=200 unique_source_ips=2
+2026-04-24 12:25:59 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=2
+2026-04-24 12:34:11 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 12:34:11 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 12:34:11 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 12:35:40 INFO LIVE_RUN packet_count=200 unique_source_ips=2
+2026-04-24 12:35:40 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=2
+2026-04-24 12:44:08 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 12:44:08 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 12:44:08 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 12:45:52 INFO LIVE_RUN packet_count=200 unique_source_ips=2
+2026-04-24 12:45:52 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=2
+2026-04-24 13:09:56 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 13:09:56 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 13:09:56 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 13:11:14 INFO LIVE_RUN packet_count=200 unique_source_ips=2
+2026-04-24 13:11:14 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=2
+2026-04-24 13:32:30 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 13:32:30 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 13:32:30 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 15:14:50 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 15:14:50 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 15:14:50 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 15:23:07 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 15:23:07 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 15:23:07 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 15:24:28 INFO LIVE_RUN packet_count=200 unique_source_ips=2
+2026-04-24 15:24:28 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=2
+2026-04-24 16:46:37 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 16:46:37 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 16:46:37 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 16:49:28 INFO LIVE_RUN packet_count=183 unique_source_ips=2
+2026-04-24 16:49:28 INFO LIVE_NO_ALERTS interface=None packet_count=183 unique_source_ips=2
+2026-04-24 17:14:05 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 17:14:05 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 17:14:05 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 17:17:59 INFO LIVE_RUN packet_count=200 unique_source_ips=2
+2026-04-24 17:17:59 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=2
+2026-04-24 17:39:34 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 17:39:34 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 17:39:34 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 17:40:54 INFO LIVE_RUN packet_count=200 unique_source_ips=2
+2026-04-24 17:40:54 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=2
+2026-04-24 17:56:11 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 17:56:11 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 17:56:11 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 18:10:48 ALERT HIGH HIGH_TRAFFIC Source=212.102.46.24 Packets=9399 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 18:10:48 ALERT MEDIUM HIGH_TRAFFIC Source=192.168.8.137 Packets=3206 Threshold=500 Detection=Possible_Traffic_Anomaly
+2026-04-24 18:10:48 INFO OFFLINE_RUN packet_count=12619 unique_source_ips=3
+2026-04-24 18:11:53 INFO LIVE_RUN packet_count=200 unique_source_ips=22
+2026-04-24 18:11:53 INFO LIVE_NO_ALERTS interface=None packet_count=200 unique_source_ips=22
