@@ -81,16 +81,16 @@ Possible future improvements include:
 - more detection rules
 - more advanced alert prioritization
 
-## How to Run
+## How to run
 
-# Offline Mode
+# Offline mode
 Use offline mode to analyze a saved PCAP file: py scripts/ids_basic.py offline captures/kali_portscan.pcapng
 
-# Live Mode
+# Live mode
 py scripts/ids_basic.py live
 Or specify interface, packet limit, and timeout: py scripts/ids_basic.py live 3 500 60
 
-# Run the Web Dashboard
+# Run the web dashboard
 py app.py
 Then open this in your browser: http://127.0.0.1:5000
 
