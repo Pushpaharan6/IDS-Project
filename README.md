@@ -20,11 +20,9 @@ The IDS supports:
 This project demonstrates key cybersecurity concepts such as packet inspection, network monitoring, anomaly detection, alert logging, and dashboard-based reporting.
 
 ---
-
 ## Project Goals
 
 The main goals of this project are to:
-
 - analyze `.pcap` and `.pcapng` files
 - detect suspicious traffic patterns
 - identify top traffic sources
@@ -34,9 +32,7 @@ The main goals of this project are to:
 - support controlled live testing in a lab environment
 
 ---
-
 ## Features
-
 - Offline PCAP analysis
 - Live packet capture support
 - Port scan detection
@@ -51,7 +47,6 @@ The main goals of this project are to:
 - Downloadable CSV report export
 
 ---
-
 ## Detection Rules
 
 The IDS currently uses three main detection rules:
@@ -69,18 +64,6 @@ Counts how many packets are sent by each source IP.
 If the count exceeds the configured threshold, the IDS generates a `HIGH_TRAFFIC` alert.
 
 ---
-
-## Future Improvements
-Possible future improvements include:
-- machine learning anomaly detection
-- real-time network visualization
-- SIEM integration
-- improved live capture reliability on Windows virtual adapters
-- additional dashboard charts and analytics
-- downloadable CSV and advanced report formats
-- more detection rules
-- more advanced alert prioritization
-
 ## How to run
 
 ### Offline mode
@@ -93,6 +76,29 @@ Or specify interface, packet limit, and timeout: py scripts/ids_basic.py live 3 
 ### Run the web dashboard
 py app.py
 Then open this in your browser: http://127.0.0.1:5000
+
+## Latest Updates
+Recent improvements to the project include:
+
+- improved Flask dashboard layout and styling
+- added alert summary display by rule type
+- added severity badges for alert visualization
+- added downloadable TXT report export
+- added downloadable CSV report export
+- improved README documentation and run instructions
+- improved logging structure with text and JSON output
+- added better support for dashboard-based review of suspicious traffic
+
+## Future Improvements
+Possible future improvements include:
+- machine learning anomaly detection
+- real-time network visualization
+- SIEM integration
+- improved live capture reliability on Windows virtual adapters
+- additional dashboard charts and analytics
+- downloadable CSV and advanced report formats
+- more detection rules
+- more advanced alert prioritization
 
 ## Alert Severity
 
@@ -139,18 +145,6 @@ The IDS generates several output files:
 - logs/ids_results.txt → latest results summary
 - downloadable TXT report from dashboard
 - downloadable CSV report from dashboard
-
-## Latest Updates
-Recent improvements to the project include:
-
-- improved Flask dashboard layout and styling
-- added alert summary display by rule type
-- added severity badges for alert visualization
-- added downloadable TXT report export
-- added downloadable CSV report export
-- improved README documentation and run instructions
-- improved logging structure with text and JSON output
-- added better support for dashboard-based review of suspicious traffic
 
 ## Known Limitations
 - Live capture reliability on Windows may vary depending on the selected interface and adapter configuration.
