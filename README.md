@@ -83,14 +83,14 @@ Possible future improvements include:
 
 ## How to run
 
-# Offline mode
+### Offline mode
 Use offline mode to analyze a saved PCAP file: py scripts/ids_basic.py offline captures/kali_portscan.pcapng
 
-# Live mode
+### Live mode
 py scripts/ids_basic.py live
 Or specify interface, packet limit, and timeout: py scripts/ids_basic.py live 3 500 60
 
-# Run the web dashboard
+### Run the web dashboard
 py app.py
 Then open this in your browser: http://127.0.0.1:5000
 
