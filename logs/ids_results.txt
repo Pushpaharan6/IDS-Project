@@ -1,8 +1,8 @@
-IDS LIVE RESULTS - 2026-04-23 18:10:04
+IDS LIVE RESULTS - 2026-04-24 00:43:52
 Interface: None
-Total Packets: 145
-Unique Source IPs: 22
-Top Talkers: [('10.5.0.2', 66), ('140.82.113.21', 28), ('20.42.65.85', 14), ('107.21.111.11', 5), ('150.171.28.11', 4)]
-Traffic Thresholds: p50=2, p90=13
+Total Packets: 200
+Unique Source IPs: 2
+Top Talkers: [('94.156.149.148', 104), ('192.168.8.137', 93)]
+Traffic Thresholds: p50=98, p90=102
 Alert Count: 0
 Highest Severity: NONE
