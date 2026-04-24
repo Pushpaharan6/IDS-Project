@@ -70,6 +70,30 @@ If the count exceeds the configured threshold, the IDS generates a `HIGH_TRAFFIC
 
 ---
 
+## Future Improvements
+Possible future improvements include:
+- machine learning anomaly detection
+- real-time network visualization
+- SIEM integration
+- improved live capture reliability on Windows virtual adapters
+- additional dashboard charts and analytics
+- downloadable CSV and advanced report formats
+- more detection rules
+- more advanced alert prioritization
+
+## How to Run
+
+# Offline Mode
+Use offline mode to analyze a saved PCAP file: py scripts/ids_basic.py offline captures/kali_portscan.pcapng
+
+# Live Mode
+py scripts/ids_basic.py live
+Or specify interface, packet limit, and timeout: py scripts/ids_basic.py live 3 500 60
+
+# Run the Web Dashboard
+py app.py
+Then open this in your browser: http://127.0.0.1:5000
+
 ## Alert Severity
 
 To improve readability and prioritization, alerts are displayed with severity levels:
@@ -133,18 +157,6 @@ Recent improvements to the project include:
 - Offline PCAP analysis is currently the most reliable workflow for demonstrating the IDS.
 - ICMP detection logic was explored, but still requires additional refinement depending on capture format and interface behavior.
 
-## Future Improvements
-Possible future improvements include:
-
-- machine learning anomaly detection
-- real-time network visualization
-- SIEM integration
-- improved live capture reliability on Windows virtual adapters
-- additional dashboard charts and analytics
-- downloadable CSV and advanced report formats
-- more detection rules
-- more advanced alert prioritization
-
   ## Demonstration Summary
   The project was successfully demonstrated using:
 
@@ -198,15 +210,4 @@ IDS-Project/
     ├── ids_basic.py           # Main IDS engine
     └── packet_capture.py      # Packet capture helper
 
-## How to Run
 
-# Offline Mode
-Use offline mode to analyze a saved PCAP file: py scripts/ids_basic.py offline captures/kali_portscan.pcapng
-
-# Live Mode
-py scripts/ids_basic.py live
-Or specify interface, packet limit, and timeout: py scripts/ids_basic.py live 3 500 60
-
-# Run the Web Dashboard
-py app.py
-Then open this in your browser: http://127.0.0.1:5000
